@@ -5,7 +5,7 @@
 - Make sure you ahve the latest code/branch. The command to do that is git pull origin main
 
 - Once you have that, you are good to code. 
-
+- Now you code .... .... .... ... DONE. 
 - So you have finished coding, now what?
 
 ## Step 2:
