@@ -1,11 +1,14 @@
 require('dotenv').config();
 const express = require('express');
-const mysql = require('mysql2/promise');
+const path = require('path');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
+// Import database connection
+const { createConnection } = require('./server/config/db');
+
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 // Middleware to parse JSON bodies
 app.use(express.json());
@@ -14,38 +17,46 @@ app.use(express.json());
 app.use(express.static('public'));
 
 //////////////////////////////////////
-//ROUTES TO SERVE HTML FILES
+// ROUTES TO SERVE HTML FILES
 //////////////////////////////////////
 // Default route to serve logon.html
 app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/public/logon.html');
+    res.sendFile(path.join(__dirname, '/public/logon.html'));
 });
 
 // Route to serve dashboard.html
 app.get('/dashboard', (req, res) => {
-    res.sendFile(__dirname + '/public/dashboard.html');
+    res.sendFile(path.join(__dirname, '/public/dashboard.html'));
+});
+
+// Add routes for other HTML pages
+app.get('/register', (req, res) => {
+    res.sendFile(path.join(__dirname, '/public/register.html'));
+});
+
+app.get('/profile', (req, res) => {
+    res.sendFile(path.join(__dirname, '/public/profile.html'));
+});
+
+app.get('/events', (req, res) => {
+    res.sendFile(path.join(__dirname, '/public/events.html'));
+});
+
+app.get('/create-event', (req, res) => {
+    res.sendFile(path.join(__dirname, '/public/create-event.html'));
 });
 //////////////////////////////////////
-//END ROUTES TO SERVE HTML FILES
+// END ROUTES TO SERVE HTML FILES
 //////////////////////////////////////
 
 
 /////////////////////////////////////////////////
-//HELPER FUNCTIONS AND AUTHENTICATION MIDDLEWARE
+// AUTHENTICATION MIDDLEWARE
 /////////////////////////////////////////////////
-// Helper function to create a MySQL connection
-async function createConnection() {
-    return await mysql.createConnection({
-        host: process.env.DB_HOST,
-        user: process.env.DB_USER,
-        password: process.env.DB_PASSWORD,
-        database: process.env.DB_NAME,
-    });
-}
-
-// **Authorization Middleware: Verify JWT Token and Check User in Database**
+// Authentication Middleware: Verify JWT Token and Check User in Database
 async function authenticateToken(req, res, next) {
-    const token = req.headers['authorization'];
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1]; // Extract token from "Bearer TOKEN"
 
     if (!token) {
         return res.status(401).json({ message: 'Access denied. No token provided.' });
@@ -59,19 +70,25 @@ async function authenticateToken(req, res, next) {
         try {
             const connection = await createConnection();
 
-            // Query the database to verify that the email is associated with an active account
+            // Query the database to verify that the user exists
             const [rows] = await connection.execute(
-                'SELECT email FROM user WHERE email = ?',
+                'SELECT user_id, username, email FROM users WHERE email = ?',
                 [decoded.email]
             );
 
             await connection.end();  // Close connection
 
             if (rows.length === 0) {
-                return res.status(403).json({ message: 'Account not found or deactivated.' });
+                return res.status(403).json({ message: 'User not found or deactivated.' });
             }
 
-            req.user = decoded;  // Save the decoded email for use in the route
+            // Add user information to the request
+            req.user = {
+                userId: rows[0].user_id,
+                username: rows[0].username,
+                email: rows[0].email
+            };
+            
             next();  // Proceed to the next middleware or route handler
         } catch (dbError) {
             console.error(dbError);
@@ -80,19 +97,19 @@ async function authenticateToken(req, res, next) {
     });
 }
 /////////////////////////////////////////////////
-//END HELPER FUNCTIONS AND AUTHENTICATION MIDDLEWARE
+// END AUTHENTICATION MIDDLEWARE
 /////////////////////////////////////////////////
 
 
 //////////////////////////////////////
-//ROUTES TO HANDLE API REQUESTS
+// API ROUTES
 //////////////////////////////////////
-// Route: Create Account
-app.post('/api/create-account', async (req, res) => {
-    const { email, password } = req.body;
+// Route: Create Account (Register)
+app.post('/api/auth/register', async (req, res) => {
+    const { username, email, password, full_name, city } = req.body;
 
-    if (!email || !password) {
-        return res.status(400).json({ message: 'Email and password are required.' });
+    if (!username || !email || !password || !full_name) {
+        return res.status(400).json({ message: 'Username, email, password, and full name are required.' });
     }
 
     try {
@@ -100,16 +117,25 @@ app.post('/api/create-account', async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);  // Hash password
 
         const [result] = await connection.execute(
-            'INSERT INTO user (email, password) VALUES (?, ?)',
-            [email, hashedPassword]
+            'INSERT INTO users (username, email, password, full_name, city) VALUES (?, ?, ?, ?, ?)',
+            [username, email, hashedPassword, full_name, city || null]
         );
 
         await connection.end();  // Close connection
 
-        res.status(201).json({ message: 'Account created successfully!' });
+        // Generate JWT token for immediate login
+        const token = jwt.sign(
+            { userId: result.insertId, username, email },
+            process.env.JWT_SECRET
+        );
+
+        res.status(201).json({ 
+            message: 'Account created successfully!',
+            token
+        });
     } catch (error) {
         if (error.code === 'ER_DUP_ENTRY') {
-            res.status(409).json({ message: 'An account with this email already exists.' });
+            res.status(409).json({ message: 'An account with this username or email already exists.' });
         } else {
             console.error(error);
             res.status(500).json({ message: 'Error creating account.' });
@@ -117,70 +143,165 @@ app.post('/api/create-account', async (req, res) => {
     }
 });
 
-// Route: Logon
-app.post('/api/login', async (req, res) => {
-    const { email, password } = req.body;
+// Route: Login
+app.post('/api/auth/login', async (req, res) => {
+    const { username, password } = req.body;
 
-    if (!email || !password) {
-        return res.status(400).json({ message: 'Email and password are required.' });
+    if (!username || !password) {
+        return res.status(400).json({ message: 'Username and password are required.' });
     }
 
     try {
         const connection = await createConnection();
 
         const [rows] = await connection.execute(
-            'SELECT * FROM user WHERE email = ?',
-            [email]
+            'SELECT * FROM users WHERE username = ?',
+            [username]
         );
 
         await connection.end();  // Close connection
 
         if (rows.length === 0) {
-            return res.status(401).json({ message: 'Invalid email or password.' });
+            return res.status(401).json({ message: 'Invalid username or password.' });
         }
 
         const user = rows[0];
 
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
-            return res.status(401).json({ message: 'Invalid email or password.' });
+            return res.status(401).json({ message: 'Invalid username or password.' });
         }
 
         const token = jwt.sign(
-            { email: user.email },
-            process.env.JWT_SECRET,
-            { expiresIn: '1h' }
+            { userId: user.user_id, username: user.username, email: user.email },
+            process.env.JWT_SECRET
         );
 
-        res.status(200).json({ token });
+        res.status(200).json({ 
+            token,
+            user: {
+                userId: user.user_id, 
+                username: user.username,
+                email: user.email,
+                fullName: user.full_name
+            }
+        });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Error logging in.' });
     }
 });
 
-// Route: Get All Email Addresses
+// Route: Get Current User
+app.get('/api/auth/me', authenticateToken, async (req, res) => {
+    try {
+        const connection = await createConnection();
+
+        const [rows] = await connection.execute(
+            'SELECT user_id, username, email, full_name, city, bio, profile_picture FROM users WHERE user_id = ?',
+            [req.user.userId]
+        );
+
+        await connection.end();  // Close connection
+
+        if (rows.length === 0) {
+            return res.status(404).json({ message: 'User not found.' });
+        }
+
+        const user = rows[0];
+        
+        res.status(200).json({
+            userId: user.user_id, 
+            username: user.username,
+            email: user.email,
+            fullName: user.full_name,
+            city: user.city,
+            bio: user.bio,
+            profilePicture: user.profile_picture
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error retrieving user data.' });
+    }
+});
+
+// Route: Get All Users (Protected)
 app.get('/api/users', authenticateToken, async (req, res) => {
     try {
         const connection = await createConnection();
 
-        const [rows] = await connection.execute('SELECT email FROM user');
+        const [rows] = await connection.execute(
+            'SELECT user_id, username, email, full_name, city FROM users'
+        );
 
         await connection.end();  // Close connection
 
-        const emailList = rows.map((row) => row.email);
-        res.status(200).json({ emails: emailList });
+        res.status(200).json({ users: rows });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Error retrieving email addresses.' });
+        res.status(500).json({ message: 'Error retrieving users.' });
     }
 });
+
+// Route: Update User Profile
+app.put('/api/users/:userId', authenticateToken, async (req, res) => {
+    const { userId } = req.params;
+    const { full_name, city, bio } = req.body;
+    
+    // Ensure users can only update their own profile
+    if (parseInt(userId) !== req.user.userId) {
+        return res.status(403).json({ message: 'You can only update your own profile.' });
+    }
+
+    try {
+        const connection = await createConnection();
+        
+        const [result] = await connection.execute(
+            'UPDATE users SET full_name = ?, city = ?, bio = ? WHERE user_id = ?',
+            [full_name, city || null, bio || null, userId]
+        );
+
+        await connection.end();  // Close connection
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: 'User not found.' });
+        }
+
+        res.status(200).json({ message: 'Profile updated successfully.' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error updating profile.' });
+    }
+});
+
+// Route: Verify Token
+app.get('/api/auth/verify', authenticateToken, (req, res) => {
+    res.status(200).json({ valid: true, user: req.user });
+});
 //////////////////////////////////////
-//END ROUTES TO HANDLE API REQUESTS
+// END API ROUTES
 //////////////////////////////////////
 
+// Database connection test when starting the server
+const testDbConnection = async () => {
+    try {
+        const connection = await createConnection();
+        console.log('Database connection established successfully.');
+        await connection.end();
+        return true;
+    } catch (error) {
+        console.error('Database connection error:', error.message);
+        return false;
+    }
+};
 
 // Start the server
-app.listen(port, () => {
+app.listen(port, async () => {
     console.log(`Server running at http://localhost:${port}`);
+    await testDbConnection();
 });
+
+// Export the database connection helper
+module.exports = {
+    createConnection
+};

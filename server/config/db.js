@@ -3,31 +3,36 @@ const dotenv = require('dotenv');
 
 dotenv.config();
 
-// Create connection pool
-const pool = mysql.createPool({
-  host: process.env.DB_HOST || 'localhost',
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || '',
-  database: process.env.DB_NAME || 'sports_social_app',
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0
-});
+/**
+ * Helper function to create a MySQL connection
+ * @returns {Promise<mysql.Connection>} MySQL connection
+ */
+async function createConnection() {
+    return await mysql.createConnection({
+        host: process.env.DB_HOST || 'localhost',
+        user: process.env.DB_USER || 'root',
+        password: process.env.DB_PASSWORD || '',
+        database: process.env.DB_NAME || 'sports_social_app',
+    });
+}
 
-// Test database connection
+/**
+ * Test database connection
+ * @returns {Promise<boolean>} Connection success status
+ */
 const testConnection = async () => {
-  try {
-    const connection = await pool.getConnection();
-    console.log('Database connection established successfully.');
-    connection.release();
-    return true;
-  } catch (error) {
-    console.error('Error connecting to database:', error.message);
-    return false;
-  }
+    try {
+        const connection = await createConnection();
+        console.log('Database connection established successfully.');
+        await connection.end();
+        return true;
+    } catch (error) {
+        console.error('Error connecting to database:', error.message);
+        return false;
+    }
 };
 
 module.exports = {
-  pool,
-  testConnection
+    createConnection,
+    testConnection
 };
