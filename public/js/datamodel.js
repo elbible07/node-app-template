@@ -16,7 +16,7 @@ const DataModel = (function () {
     //LATER.  RIGHT NOW, WE'RE JUST STORING THE JWT TOKEN
     //AND THE LIST OF USERS.
     let token = null;  // Holds the JWT token
-    let users = [];    // Holds the list of user emails
+    let users = [];    // Holds the list of users
 
     //WE CAN CREATE FUNCTIONS HERE TO FETCH DATA FROM THE SERVER
     //AND RETURN IT TO THE CONTROLLER.  THE CONTROLLER CAN THEN
@@ -43,8 +43,8 @@ const DataModel = (function () {
                 const response = await fetch('/api/users', {
                     method: 'GET',
                     headers: {
-                        // we need to send the token in the headers
-                        'Authorization': token,
+                        // we need to send the token in the Authorization header
+                        'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json',
                     },
                 });
@@ -55,17 +55,46 @@ const DataModel = (function () {
                 }
 
                 const data = await response.json();
-                //store the emails in the users variable so we can
-                //use them again later without having to fetch them
-                users = data.emails;
-                //return the emails to the controller
-                //so that it can update the view
+                
+                // Format the users data for display
+                users = data.users.map(user => 
+                    `${user.username} (${user.email}) - ${user.full_name || 'No name'} from ${user.city || 'Unknown location'}`
+                );
+                
                 return users;
             } catch (error) {
                 console.error("Error in API call:", error);
                 return [];
             }
         },
+
+        // Get the current user's information
+        getCurrentUser: async function() {
+            if (!token) {
+                console.error("Token is not set.");
+                return null;
+            }
+
+            try {
+                const response = await fetch('/api/auth/me', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                if (!response.ok) {
+                    console.error("Error fetching current user:", await response.json());
+                    return null;
+                }
+
+                return await response.json();
+            } catch (error) {
+                console.error("Error fetching current user:", error);
+                return null;
+            }
+        }
 
         //ADD MORE FUNCTIONS HERE TO FETCH DATA FROM THE SERVER
         //AND SEND DATA TO THE SERVER AS NEEDED
