@@ -24,9 +24,15 @@ document.addEventListener('DOMContentLoaded', () => {
     //////////////////////////////////////////
     // Log out and redirect to login
     logoutButton.addEventListener('click', () => {
-        localStorage.removeItem('token');
-        window.location.href = '/';
-    });
+    // Clear all authentication data
+    localStorage.removeItem('jwtToken');
+    
+    // Force redirect to login page, preventing back navigation
+    window.location.replace('/');
+    
+    // For extra security, return false to prevent default action
+    return false;
+});
 
     // Refresh list when the button is clicked
     refreshButton.addEventListener('click', async () => {
