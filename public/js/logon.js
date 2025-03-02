@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
         messageEl.className = 'message';
     });
 
-    // Logon form submission
+    // Logon form submission. Thsi how it works...
     logonForm.addEventListener('submit', async (event) => {
         event.preventDefault();
         const username = document.getElementById('login-email').value;
