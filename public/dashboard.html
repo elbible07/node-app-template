@@ -3,19 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
+    <title>Sports Dashboard</title>
     <link rel="stylesheet" href="/css/dashboard.css">
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>Users</h1>
+            <h1>Sports Dashboard</h1>
             <div>
-                <button id="refreshButton">Refresh List</button>
+                <button id="listUsersButton">List Users</button>
+                <button id="refreshButton">Refresh</button>
                 <button id="logoutButton">Log Out</button>
             </div>
         </div>
-        <div class="user-list" id="userList"></div>
+        
+        <div class="tabs">
+            <button class="tab-button active" data-tab="events">Events</button>
+            <button class="tab-button" data-tab="teams">Teams</button>
+            <button class="tab-button" data-tab="profile">Profile</button>
+            <button class="tab-button" data-tab="scorecard">Scorecard</button>
+        </div>
+
+        <div class="tab-content">
+            <div id="events-tab" class="tab-pane active">
+                <h2>Upcoming Events / Users</h2>
+                <div id="eventsList"></div>
+            </div>
+            <div id="teams-tab" class="tab-pane">
+                <h2>My Teams</h2>
+                <div id="teamsList"></div>
+            </div>
+            <div id="profile-tab" class="tab-pane">
+                <h2>User Profile</h2>
+                <div id="profileDetails"></div>
+            </div>
+            <div id="scorecard-tab" class="tab-pane">
+                <h2>Performance Scorecard</h2>
+                <div id="scorecardDetails"></div>
+            </div>
+            <div id="users-tab" class="tab-pane">
+                <h2>User List</h2>
+                <div id="usersList"></div>
+            </div>
+        </div>
     </div>
     <script src="/js/dashboard.js"></script>
     <script src="/js/datamodel.js"></script>
