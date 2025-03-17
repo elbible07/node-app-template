@@ -104,6 +104,12 @@ async function authenticateToken(req, res, next) {
 //////////////////////////////////////
 // API ROUTES
 //////////////////////////////////////
+// Import event routes
+const eventRoutes = require('./server/routes/eventRoutes');
+
+// Use event routes with authentication middleware
+app.use('/api/events', authenticateToken, eventRoutes);
+
 // Route: Create Account (Register)
 app.post('/api/auth/register', async (req, res) => {
     const { username, email, password, full_name, city } = req.body;

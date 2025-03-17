@@ -16,6 +16,51 @@ document.addEventListener('DOMContentLoaded', () => {
     const refreshButton = document.getElementById('refreshButton');
     const listUsersButton = document.getElementById('listUsersButton');
     const tabButtons = document.querySelectorAll('.tab-button');
+   
+    // Add Create Event button
+    const createEventButton = document.createElement('button');
+    createEventButton.id = 'createEventButton';
+    createEventButton.textContent = 'Create Event';
+    document.querySelector('.header div').prepend(createEventButton);
+
+    // Create the modal container (but don't show it yet)
+    const modalContainer = document.createElement('div');
+    modalContainer.id = 'eventModalContainer';
+    modalContainer.className = 'modal-container';
+    modalContainer.style.display = 'none';
+    modalContainer.innerHTML = `
+      <div class="modal-content">
+        <span class="close-button">&times;</span>
+        <h2>Create New Sport Event</h2>
+        <form id="createEventForm">
+          <div class="form-group">
+            <label for="eventName">Event Name:</label>
+            <input type="text" id="eventName" required>
+          </div>
+          <div class="form-group">
+            <label for="sportType">Sport Type:</label>
+            <input type="text" id="sportType" required>
+          </div>
+          <div class="form-group">
+            <label for="eventDate">Date & Time:</label>
+            <input type="datetime-local" id="eventDate" required>
+          </div>
+          <div class="form-group">
+            <label for="eventCity">City:</label>
+            <input type="text" id="eventCity" required>
+          </div>
+          <div class="form-group">
+            <label for="playerList">Player List (comma separated):</label>
+            <textarea id="playerList" rows="3"></textarea>
+          </div>
+          <div class="button-group">
+            <button type="submit" id="submitEventButton">Create Event</button>
+            <button type="button" id="sendInviteButton">Send Invite</button>
+          </div>
+        </form>
+      </div>
+    `;
+    document.body.appendChild(modalContainer);
     //////////////////////////////////////////
     //END ELEMENTS TO ATTACH EVENT LISTENERS
     //////////////////////////////////////////
@@ -24,6 +69,60 @@ document.addEventListener('DOMContentLoaded', () => {
     //////////////////////////////////////////
     //EVENT LISTENERS
     //////////////////////////////////////////
+    // Add event listener for Create Event button
+    createEventButton.addEventListener('click', () => {
+        modalContainer.style.display = 'flex';
+    });
+
+    // Close the modal when clicking the close button
+    document.querySelector('.close-button').addEventListener('click', () => {
+        modalContainer.style.display = 'none';
+    });
+
+    // Close the modal when clicking outside of it
+    window.addEventListener('click', (event) => {
+        if (event.target === modalContainer) {
+            modalContainer.style.display = 'none';
+        }
+    });
+
+    // Handle event form submission
+    document.getElementById('createEventForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const eventData = {
+            event_name: document.getElementById('eventName').value,
+            sport_type: document.getElementById('sportType').value,
+            event_date: document.getElementById('eventDate').value,
+            city: document.getElementById('eventCity').value,
+            player_list: document.getElementById('playerList').value
+        };
+        
+        try {
+            const result = await DataModel.createEvent(eventData);
+            if (result && result.success) {
+                alert('Event created successfully!');
+                modalContainer.style.display = 'none';
+                // Refresh the events list
+                if (document.querySelector('.tab-button.active').dataset.tab === 'events') {
+                    await loadEvents();
+                }
+                // Reset form
+                document.getElementById('createEventForm').reset();
+            } else {
+                alert('Failed to create event. Please try again.');
+            }
+        } catch (error) {
+            console.error('Error creating event:', error);
+            alert('An error occurred while creating the event.');
+        }
+    });
+
+    // Handle the send invite button (currently just a placeholder)
+    document.getElementById('sendInviteButton').addEventListener('click', () => {
+        alert('Invite functionality will be implemented in a future update.');
+    });
+
     // Log out and redirect to login
     logoutButton.addEventListener('click', () => {
         // Clear all authentication data
@@ -158,20 +257,82 @@ async function renderUserList() {
     }
 }
 
+// Update the loadEvents function to add "Join Event" buttons
 async function loadEvents() {
     const eventsListElement = document.getElementById('eventsList');
     eventsListElement.innerHTML = '<div class="loading-message">Loading events...</div>';
-    // TODO: Implement actual event loading logic
-    eventsListElement.innerHTML = 'No events found. Check back later!';
+    
+    try {
+        const events = await DataModel.getEvents();
+        
+        // Clear previous content
+        eventsListElement.innerHTML = '';
+        
+        if (!events || events.length === 0) {
+            eventsListElement.innerHTML = '<div class="no-events-message">No events found. Create a new event to get started!</div>';
+            return;
+        }
+        
+        // Display each event
+        for (const event of events) {
+            const eventDate = new Date(event.event_date);
+            const formattedDate = eventDate.toLocaleString();
+            
+            // Check if user has already joined this event
+            const hasJoined = await DataModel.checkEventJoined(event.event_id);
+            
+            const eventElement = document.createElement('div');
+            eventElement.className = 'event-item';
+            eventElement.innerHTML = `
+                <h3>${event.event_name}</h3>
+                <p><strong>Sport:</strong> ${event.sport_type}</p>
+                <p><strong>Date:</strong> ${formattedDate}</p>
+                <p><strong>Location:</strong> ${event.city}</p>
+                <p><strong>Created by:</strong> ${event.creator_name || 'Unknown'}</p>
+                ${event.player_list ? `<p><strong>Players:</strong> ${event.player_list}</p>` : ''}
+                ${hasJoined 
+                    ? '<button class="join-button joined" disabled>Joined</button>' 
+                    : `<button class="join-button" data-event-id="${event.event_id}">Join Event</button>`
+                }
+            `;
+            
+            eventsListElement.appendChild(eventElement);
+        }
+        
+        // Add event listeners to join buttons
+        document.querySelectorAll('.join-button:not(.joined)').forEach(button => {
+            button.addEventListener('click', handleJoinEvent);
+        });
+        
+    } catch (error) {
+        console.error('Error loading events:', error);
+        eventsListElement.innerHTML = '<div class="error-message">Failed to load events. Please try again later.</div>';
+    }
 }
 
-async function loadTeams() {
-    const teamsListElement = document.getElementById('teamsList');
-    teamsListElement.innerHTML = '<div class="loading-message">Loading teams...</div>';
-    // TODO: Implement actual teams loading logic
-    teamsListElement.innerHTML = 'No teams found. Create or join a team!';
+// Handle join event button clicks
+async function handleJoinEvent(e) {
+    const eventId = e.target.dataset.eventId;
+    
+    try {
+        const result = await DataModel.joinEvent(eventId);
+        if (result && result.success) {
+            // Update button to show joined status
+            e.target.textContent = 'Joined';
+            e.target.classList.add('joined');
+            e.target.disabled = true;
+            
+            alert('You have successfully joined the event!');
+        } else {
+            alert('Failed to join event. Please try again.');
+        }
+    } catch (error) {
+        console.error('Error joining event:', error);
+        alert('An error occurred while joining the event.');
+    }
 }
 
+// Update loadProfile function to show joined events
 async function loadProfile() {
     const profileDetailsElement = document.getElementById('profileDetails');
     profileDetailsElement.innerHTML = '<div class="loading-message">Loading profile...</div>';
@@ -179,14 +340,40 @@ async function loadProfile() {
     try {
         const currentUser = await DataModel.getCurrentUser();
         if (currentUser) {
-            profileDetailsElement.innerHTML = `
+            let profileHTML = `
                 <div class="profile-info">
                     <p><strong>Username:</strong> ${currentUser.username}</p>
                     <p><strong>Email:</strong> ${currentUser.email}</p>
-                    <p><strong>Full Name:</strong> ${currentUser.full_name || 'Not provided'}</p>
+                    <p><strong>Full Name:</strong> ${currentUser.fullName || 'Not provided'}</p>
                     <p><strong>City:</strong> ${currentUser.city || 'Not set'}</p>
                 </div>
             `;
+            
+            // Add joined events section
+            profileHTML += '<div class="joined-events"><h3>Events Joined</h3>';
+            
+            // Fetch joined events
+            const joinedEvents = await DataModel.getJoinedEvents();
+            
+            if (joinedEvents && joinedEvents.length > 0) {
+                profileHTML += '<ul class="event-list">';
+                joinedEvents.forEach(event => {
+                    const eventDate = new Date(event.event_date);
+                    profileHTML += `
+                        <li>
+                            <strong>${event.event_name}</strong> - ${event.sport_type}
+                            <br>Date: ${eventDate.toLocaleString()}
+                            <br>Location: ${event.city}
+                        </li>
+                    `;
+                });
+                profileHTML += '</ul>';
+            } else {
+                profileHTML += '<p>You haven\'t joined any events yet.</p>';
+            }
+            
+            profileHTML += '</div>';
+            profileDetailsElement.innerHTML = profileHTML;
         } else {
             profileDetailsElement.innerHTML = 'Unable to load profile. Please try again.';
         }
@@ -194,6 +381,13 @@ async function loadProfile() {
         console.error('Error loading profile:', error);
         profileDetailsElement.innerHTML = 'Error loading profile. Please try again.';
     }
+}
+
+async function loadTeams() {
+    const teamsListElement = document.getElementById('teamsList');
+    teamsListElement.innerHTML = '<div class="loading-message">Loading teams...</div>';
+    // TODO: Implement actual teams loading logic
+    teamsListElement.innerHTML = 'No teams found. Create or join a team!';
 }
 
 async function loadScorecard() {

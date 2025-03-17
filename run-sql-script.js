@@ -7,7 +7,7 @@ async function runSQLScript() {
   
   try {
     // Read SQL file
-    const filePath = path.join(__dirname, 'database', 'users_table.sql');
+    const filePath = path.join(__dirname, 'database','event_participants_table.sql');
     let sqlScript = fs.readFileSync(filePath, 'utf8');
     
     // Remove the CREATE DATABASE and USE statements
