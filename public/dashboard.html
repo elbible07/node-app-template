@@ -19,6 +19,7 @@
         
         <div class="tabs">
             <button class="tab-button active" data-tab="events">Events</button>
+            <button class="tab-button" data-tab="calendar">Calendar</button>
             <button class="tab-button" data-tab="teams">Teams</button>
             <button class="tab-button" data-tab="profile">Profile</button>
             <button class="tab-button" data-tab="scorecard">Scorecard</button>
@@ -46,8 +47,51 @@
                 <div id="usersList"></div>
             </div>
         </div>
+
+        <div id="calendar-tab" class="tab-pane">
+    <h2>Events Calendar</h2>
+    <div id="calendarFilters" class="calendar-filters">
+        <div class="filter-group">
+            <label>
+                <input type="checkbox" id="showJoinedEvents"> Show only my joined events
+            </label>
+        </div>
+        <div class="filter-group">
+            <label for="sportFilter">Sport:</label>
+            <select id="sportFilter">
+                <option value="">All Sports</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label for="timeFilter">Time Period:</label>
+            <select id="timeFilter">
+                <option value="all">All Time</option>
+                <option value="today">Today</option>
+                <option value="thisWeek">This Week</option>
+                <option value="thisMonth">This Month</option>
+                <option value="nextMonth">Next Month</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label for="locationFilter">Location:</label>
+            <select id="locationFilter">
+                <option value="">All Locations</option>
+            </select>
+        </div>
+        <button id="applyFilters">Apply Filters</button>
+    </div>
+    <div id="calendarView">
+        <div id="calendarControls">
+            <button id="prevMonth">Previous</button>
+            <h3 id="currentMonthYear">March 2025</h3>
+            <button id="nextMonth">Next</button>
+        </div>
+        <div id="calendar"></div>
+    </div>
+</div>
     </div>
     <script src="/js/dashboard.js"></script>
+    <script src="/js/calendarView.js"></script>
     <script src="/js/datamodel.js"></script>
 </body>
 </html>

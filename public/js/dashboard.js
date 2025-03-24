@@ -202,6 +202,9 @@ async function switchTab(tabName) {
         case 'events':
             await loadEvents();
             break;
+        case 'calendar':
+            await loadCalendar();
+            break;
         case 'teams':
             await loadTeams();
             break;
@@ -218,7 +221,6 @@ async function switchTab(tabName) {
             console.error('Unknown tab:', tabName);
     }
 }
-
 async function renderUserList() {
     console.log('Rendering user list');
     const userListElement = document.getElementById('eventsList');
@@ -380,6 +382,35 @@ async function loadProfile() {
     } catch (error) {
         console.error('Error loading profile:', error);
         profileDetailsElement.innerHTML = 'Error loading profile. Please try again.';
+    }
+}
+
+// Calendar functionality
+async function loadCalendar() {
+    console.log('Loading calendar view');
+    // Get calendar container
+    const calendarElement = document.getElementById('calendar');
+    calendarElement.innerHTML = '<div class="loading-message">Loading calendar...</div>';
+    
+    try {
+        // Fetch all events initially
+        const events = await DataModel.getEvents();
+        
+        // Also fetch joined events to know which ones the user has already joined
+        const joinedEvents = await DataModel.getJoinedEvents();
+        const joinedEventIds = joinedEvents.map(event => event.event_id);
+        
+        // Populate sport and location filters with unique values
+        populateFilters(events);
+        
+        // Set up filter event handlers
+        setupFilterHandlers(events, joinedEventIds);
+        
+        // Initial calendar render
+        renderCalendar(new Date(), events, joinedEventIds);
+    } catch (error) {
+        console.error('Error loading calendar:', error);
+        calendarElement.innerHTML = '<div class="error-message">Failed to load calendar. Please try again later.</div>';
     }
 }
 

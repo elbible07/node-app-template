@@ -14,5 +14,6 @@ router.get('/joined', eventController.getJoinedEvents);
 router.get('/:eventId', eventController.getEventById);
 router.post('/:eventId/join', eventController.joinEvent);
 router.get('/:eventId/joined', eventController.checkEventJoined);
+router.get('/:eventId/participants', eventController.getEventParticipants);
 
 module.exports = router;

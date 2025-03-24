@@ -298,6 +298,34 @@ checkEventJoined: async function(eventId) {
         console.error("Error checking event status:", error);
         return false;
     }
+},
+// Add this to your DataModel object inside datamodel.js
+getEventParticipants: async function(eventId) {
+    if (!token) {
+        console.error("Token is not set.");
+        return [];
+    }
+
+    try {
+        const response = await fetch(`/api/events/${eventId}/participants`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            }
+        });
+
+        if (!response.ok) {
+            console.error("Error fetching event participants:", await response.json());
+            return [];
+        }
+
+        const data = await response.json();
+        return data.participants || [];
+    } catch (error) {
+        console.error("Error fetching event participants:", error);
+        return [];
+    }
 }
 
         

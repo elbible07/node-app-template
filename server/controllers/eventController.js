@@ -248,3 +248,35 @@ exports.checkEventJoined = async (req, res) => {
     await connection.end();
   }
 };
+
+// Get all participants for an event
+exports.getEventParticipants = async (req, res) => {
+  const { eventId } = req.params;
+  
+  const connection = await createConnection();
+  
+  try {
+    // Join with users table to get participant details
+    const [participants] = await connection.execute(`
+      SELECT u.user_id, u.username, u.full_name, u.city, ep.joined_at
+      FROM event_participants ep
+      JOIN users u ON ep.user_id = u.user_id
+      WHERE ep.event_id = ?
+      ORDER BY ep.joined_at ASC
+    `, [eventId]);
+    
+    res.status(200).json({
+      success: true,
+      count: participants.length,
+      participants
+    });
+  } catch (error) {
+    console.error('Error fetching event participants:', error);
+    res.status(500).json({
+      success: false,
+      message: 'An error occurred while fetching event participants'
+    });
+  } finally {
+    await connection.end();
+  }
+};

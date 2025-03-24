@@ -252,3 +252,124 @@ h1 {
   border-radius: 4px;
   border-left: 4px solid #4CAF50;
 }
+
+/* Calendar Styles */
+
+.calendar-filters {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: #f5f5f5;
+    border-radius: 5px;
+}
+
+.filter-group {
+    margin-right: 20px;
+    margin-bottom: 10px;
+}
+
+.filter-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.filter-group select, .filter-group input[type="checkbox"] {
+    padding: 5px;
+    border-radius: 3px;
+    border: 1px solid #ccc;
+}
+
+#calendarControls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+#applyFilters {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.calendar-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.calendar-table th, .calendar-table td {
+    border: 1px solid #ddd;
+    text-align: left;
+    padding: 8px;
+    height: 100px;
+    vertical-align: top;
+}
+
+.calendar-table th {
+    background-color: #f2f2f2;
+    text-align: center;
+    height: auto;
+    padding: 10px;
+    font-weight: bold;
+}
+
+.calendar-cell {
+    position: relative;
+    min-height: 100px;
+    overflow: hidden;
+}
+
+.other-month {
+    background-color: #f9f9f9;
+    color: #aaa;
+}
+
+.date-number {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 25px;
+    height: 25px;
+    text-align: center;
+    line-height: 25px;
+    font-weight: bold;
+}
+
+.day-events {
+    margin-top: 25px;
+    overflow: auto;
+    max-height: 75px;
+}
+
+.calendar-event {
+    background-color: #e1f5fe;
+    margin-bottom: 5px;
+    padding: 3px 5px;
+    border-radius: 3px;
+    border-left: 3px solid #03a9f4;
+    font-size: 0.85em;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.calendar-event:hover {
+    background-color: #b3e5fc;
+}
+
+.calendar-event.joined-event {
+    background-color: #e8f5e9;
+    border-left: 3px solid #4caf50;
+}
+
+.event-sport {
+    font-size: 0.8em;
+    color: #666;
+}
