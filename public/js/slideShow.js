@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function() {
     setActiveSlide(0);
     
     // Auto change slides every 7 seconds
-    setInterval(nextSlide, 7000);
+    setInterval(nextSlide, 6000);
     
     // Dot navigation
     dots.forEach((dot, index) => {
