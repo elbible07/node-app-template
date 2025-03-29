@@ -5,6 +5,11 @@ async function loadCalendar() {
     console.log('Loading calendar view');
     // Get calendar container
     const calendarElement = document.getElementById('calendar');
+    if (!calendarElement) {
+        console.error('Calendar element not found');
+        return;
+    }
+    
     calendarElement.innerHTML = '<div class="loading-message">Loading calendar...</div>';
     
     try {
@@ -33,6 +38,8 @@ async function loadCalendar() {
 function populateFilters(events) {
     // Get unique sports
     const sportFilter = document.getElementById('sportFilter');
+    if (!sportFilter) return;
+    
     sportFilter.innerHTML = '<option value="">All Sports</option>';
     const sports = [...new Set(events.map(event => event.sport_type))];
     sports.forEach(sport => {
@@ -44,6 +51,8 @@ function populateFilters(events) {
     
     // Get unique locations (cities)
     const locationFilter = document.getElementById('locationFilter');
+    if (!locationFilter) return;
+    
     locationFilter.innerHTML = '<option value="">All Locations</option>';
     const locations = [...new Set(events.map(event => event.city))];
     locations.forEach(location => {
@@ -60,6 +69,11 @@ function setupFilterHandlers(allEvents, joinedEventIds) {
     const nextMonthBtn = document.getElementById('nextMonth');
     const applyFiltersBtn = document.getElementById('applyFilters');
     const showJoinedEventsCheckbox = document.getElementById('showJoinedEvents');
+    
+    if (!prevMonthBtn || !nextMonthBtn || !applyFiltersBtn || !showJoinedEventsCheckbox) {
+        console.error('Calendar control elements not found');
+        return;
+    }
     
     // Ensure checkbox is unchecked by default
     showJoinedEventsCheckbox.checked = false;
@@ -91,25 +105,38 @@ function setupFilterHandlers(allEvents, joinedEventIds) {
 
 // Update the month and year display
 function updateMonthYearDisplay(date) {
+    const monthYearElement = document.getElementById('currentMonthYear');
+    if (!monthYearElement) return;
+    
     const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
                         'July', 'August', 'September', 'October', 'November', 'December'];
     const monthYear = `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
-    document.getElementById('currentMonthYear').textContent = monthYear;
+    monthYearElement.textContent = monthYear;
 }
 
 // Apply filters and render calendar
 function applyFiltersAndRender(date, allEvents, joinedEventIds) {
+    const showOnlyJoined = document.getElementById('showJoinedEvents');
+    const sportFilter = document.getElementById('sportFilter');
+    const timeFilter = document.getElementById('timeFilter');
+    const locationFilter = document.getElementById('locationFilter');
+    
+    if (!showOnlyJoined || !sportFilter || !timeFilter || !locationFilter) {
+        console.error('Filter elements not found');
+        return;
+    }
+    
     // Get filter values
-    const showOnlyJoined = document.getElementById('showJoinedEvents').checked;
-    const sportValue = document.getElementById('sportFilter').value;
-    const timeValue = document.getElementById('timeFilter').value;
-    const locationValue = document.getElementById('locationFilter').value;
+    const showOnlyJoinedValue = showOnlyJoined.checked;
+    const sportValue = sportFilter.value;
+    const timeValue = timeFilter.value;
+    const locationValue = locationFilter.value;
     
     // Filter events
     let filteredEvents = [...allEvents];
     
     // Filter by joined events
-    if (showOnlyJoined) {
+    if (showOnlyJoinedValue) {
         filteredEvents = filteredEvents.filter(event => joinedEventIds.includes(event.event_id));
     }
     
@@ -184,6 +211,11 @@ function applyFiltersAndRender(date, allEvents, joinedEventIds) {
 // Render the calendar grid
 function renderCalendar(date, events, joinedEventIds) {
     const calendarElement = document.getElementById('calendar');
+    if (!calendarElement) {
+        console.error('Calendar element not found');
+        return;
+    }
+    
     calendarElement.innerHTML = '';
     
     // Create calendar table
@@ -292,7 +324,14 @@ function renderCalendar(date, events, joinedEventIds) {
 }
 
 // Show event details in a modal
+// Show event details in a modal
 function showEventDetails(event, hasJoined) {
+    // Check if the modal already exists and remove it
+    const existingModal = document.getElementById('eventDetailModal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+    
     // Create a modal for event details
     const modalHTML = `
         <div id="eventDetailModal" class="modal-container" style="display: flex;">
@@ -340,8 +379,19 @@ function showEventDetails(event, hasJoined) {
         joinButton.addEventListener('click', async (e) => {
             await handleJoinEvent(e);
             document.getElementById('eventDetailModal').remove();
-            // Refresh the calendar
-            await loadCalendar();
+            
+            // FIXED: Don't use loadCalendar directly to avoid recursion
+            // Instead, manually refresh the calendar
+            try {
+                const events = await DataModel.getEvents();
+                const joinedEvents = await DataModel.getJoinedEvents();
+                const joinedEventIds = joinedEvents.map(event => event.event_id);
+                
+                // Just re-render without reloading everything
+                renderCalendar(new Date(), events, joinedEventIds);
+            } catch (error) {
+                console.error('Error refreshing calendar:', error);
+            }
         });
     }
     
@@ -352,6 +402,7 @@ function showEventDetails(event, hasJoined) {
 // Load event participants
 async function loadEventParticipants(eventId) {
     const participantsElement = document.getElementById('participantsList');
+    if (!participantsElement) return;
     
     try {
         // Get event participants using the DataModel
@@ -403,4 +454,4 @@ async function handleJoinEvent(e) {
 }
 
 // Expose the loadCalendar function globally so it can be used in dashboard.js
-window.loadCalendar = loadCalendar;
+window.initializeCalendar = loadCalendar;

@@ -3,95 +3,241 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sports Dashboard</title>
+    <title>Sports Social App</title>
+    <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/css/dashboard.css">
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>Sports Dashboard</h1>
-            <div>
-                <button id="listUsersButton">List Users</button>
-                <button id="refreshButton">Refresh</button>
-                <button id="logoutButton">Log Out</button>
-            </div>
-        </div>
-        
-        <div class="tabs">
-            <button class="tab-button active" data-tab="events">Events</button>
-            <button class="tab-button" data-tab="calendar">Calendar</button>
-            <button class="tab-button" data-tab="teams">Teams</button>
-            <button class="tab-button" data-tab="profile">Profile</button>
-            <button class="tab-button" data-tab="scorecard">Scorecard</button>
-        </div>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar" aria-label="Main Navigation">
+            <header class="sidebar-header">
+                <div class="brand-logo" aria-label="Sports Social App Logo">
+                    <!-- PLACEHOLDER: Add actual logo image here -->
+                    <div class="logo-placeholder">Sports Social App</div>
+                </div>
+            </header>
 
-        <div class="tab-content">
-            <div id="events-tab" class="tab-pane active">
-                <h2>Upcoming Events / Users</h2>
-                <div id="eventsList"></div>
-            </div>
-            <div id="teams-tab" class="tab-pane">
-                <h2>My Teams</h2>
-                <div id="teamsList"></div>
-            </div>
-            <div id="profile-tab" class="tab-pane">
-                <h2>User Profile</h2>
-                <div id="profileDetails"></div>
-            </div>
-            <div id="scorecard-tab" class="tab-pane">
-                <h2>Performance Scorecard</h2>
-                <div id="scorecardDetails"></div>
-            </div>
-            <div id="users-tab" class="tab-pane">
-                <h2>User List</h2>
-                <div id="usersList"></div>
-            </div>
-        </div>
+            <div class="sidebar-content">
+                <section class="main-menu" aria-label="Main Menu">
+                    <ul class="menu-list">
+                        <li class="menu-item active">
+                            <a href="#" class="menu-link tab-button" data-tab="events">
+                                <span class="icon-container active-icon">
+                                    <i class="fa-solid fa-calendar-days"></i>
+                                </span>
+                                <span class="menu-text">Events</span>
+                            </a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="#" class="menu-link tab-button" data-tab="calendar">
+                                <span class="icon-container">
+                                    <i class="fa-solid fa-calendar-week"></i>
+                                </span>
+                                <span class="menu-text">Calendar</span>
+                            </a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="#" class="menu-link tab-button" data-tab="teams">
+                                <span class="icon-container">
+                                    <i class="fa-solid fa-users-rectangle"></i>
+                                </span>
+                                <span class="menu-text">Teams</span>
+                            </a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="#" class="menu-link tab-button" data-tab="profile">
+                                <span class="icon-container">
+                                    <i class="fa-solid fa-user"></i>
+                                </span>
+                                <span class="menu-text">Profile</span>
+                            </a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="#" class="menu-link tab-button" data-tab="scorecard">
+                                <span class="icon-container">
+                                    <i class="fa-solid fa-chart-simple"></i>
+                                </span>
+                                <span class="menu-text">Scorecard</span>
+                            </a>
+                        </li>
+                    </ul>
+                </section>
 
-        <div id="calendar-tab" class="tab-pane">
-    <h2>Events Calendar</h2>
-    <div id="calendarFilters" class="calendar-filters">
-        <div class="filter-group">
-            <label>
-                <input type="checkbox" id="showJoinedEvents"> Show only my joined events
-            </label>
-        </div>
-        <div class="filter-group">
-            <label for="sportFilter">Sport:</label>
-            <select id="sportFilter">
-                <option value="">All Sports</option>
-            </select>
-        </div>
-        <div class="filter-group">
-            <label for="timeFilter">Time Period:</label>
-            <select id="timeFilter">
-                <option value="all">All Time</option>
-                <option value="today">Today</option>
-                <option value="thisWeek">This Week</option>
-                <option value="thisMonth">This Month</option>
-                <option value="nextMonth">Next Month</option>
-            </select>
-        </div>
-        <div class="filter-group">
-            <label for="locationFilter">Location:</label>
-            <select id="locationFilter">
-                <option value="">All Locations</option>
-            </select>
-        </div>
-        <button id="applyFilters">Apply Filters</button>
+                <div class="menu-divider" role="separator"></div>
+
+                <section class="settings-menu" aria-label="Settings Menu">
+                    <ul class="menu-list">
+                        <li class="menu-item">
+                            <a href="#" class="menu-link">
+                                <span class="icon-container">
+                                    <i class="fa-solid fa-gear"></i>
+                                </span>
+                                <span class="menu-text">Settings</span>
+                            </a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="#" class="menu-link">
+                                <span class="icon-container">
+                                    <i class="fa-solid fa-circle-question"></i>
+                                </span>
+                                <span class="menu-text">Help &amp; Support</span>
+                            </a>
+                        </li>
+                    </ul>
+                </section>
+            </div>
+
+            <footer class="sidebar-footer">
+                <section class="footer-actions">
+                    <button class="logout-button" id="logoutButton" aria-label="Logout">
+                        <span class="icon-container logout-icon">
+                            <i class="fa-solid fa-right-from-bracket"></i>
+                        </span>
+                        <span class="menu-text">Logout</span>
+                    </button>
+                </section>
+            </footer>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div id="top-nav-container"></div>
+            <div class="main-header">
+                <div>
+                <h1>Sports Dashboard 🔥🔥🔥</h1>
+                <p class="header-title">Here is everyhting you need to stay active, productive, and sporty 😊💪</p>
+                </div>
+                <div class="header-actions">
+                    <button id="createEventButton" class="action-button primary-button">
+                        <i class="fa-solid fa-plus"></i> Create Event
+                    </button>
+                    <button id="listUsersButton" class="action-button secondary-button">
+                        <i class="fa-solid fa-users"></i> List Users
+                    </button>
+                    <button id="refreshButton" class="action-button">
+                        <i class="fa-solid fa-arrows-rotate"></i> Refresh
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tab Content -->
+            <div class="tab-content">
+                <!-- Events Tab -->
+                <div id="events-tab" class="tab-pane active">
+                    <h2>Upcoming Events / Users</h2>
+                    <div id="eventsList"></div>
+                </div>
+
+                <!-- Teams Tab -->
+                <div id="teams-tab" class="tab-pane">
+                    <h2>My Teams</h2>
+                    <div id="teamsList"></div>
+                </div>
+
+                <!-- Profile Tab -->
+                <div id="profile-tab" class="tab-pane">
+                    <h2>User Profile</h2>
+                    <div id="profileDetails"></div>
+                </div>
+
+                <!-- Scorecard Tab -->
+                <div id="scorecard-tab" class="tab-pane">
+                    <h2>Performance Scorecard</h2>
+                    <div id="scorecardDetails"></div>
+                </div>
+
+                <!-- Users Tab -->
+                <div id="users-tab" class="tab-pane">
+                    <h2>User List</h2>
+                    <div id="usersList"></div>
+                </div>
+
+                <!-- Calendar Tab -->
+                <div id="calendar-tab" class="tab-pane">
+                    <h2>Events Calendar</h2>
+                    <div id="calendarFilters" class="calendar-filters">
+                        <div class="filter-group">
+                            <label>
+                                <input type="checkbox" id="showJoinedEvents"> Show only my joined events
+                            </label>
+                        </div>
+                        <div class="filter-group">
+                            <label for="sportFilter">Sport:</label>
+                            <select id="sportFilter">
+                                <option value="">All Sports</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="timeFilter">Time Period:</label>
+                            <select id="timeFilter">
+                                <option value="all">All Time</option>
+                                <option value="today">Today</option>
+                                <option value="thisWeek">This Week</option>
+                                <option value="thisMonth">This Month</option>
+                                <option value="nextMonth">Next Month</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="locationFilter">Location:</label>
+                            <select id="locationFilter">
+                                <option value="">All Locations</option>
+                            </select>
+                        </div>
+                        <button id="applyFilters">Apply Filters</button>
+                    </div>
+                    <div id="calendarView">
+                        <div id="calendarControls">
+                            <button id="prevMonth">Previous</button>
+                            <h3 id="currentMonthYear">March 2025</h3>
+                            <button id="nextMonth">Next</button>
+                        </div>
+                        <div id="calendar"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
     </div>
-    <div id="calendarView">
-        <div id="calendarControls">
-            <button id="prevMonth">Previous</button>
-            <h3 id="currentMonthYear">March 2025</h3>
-            <button id="nextMonth">Next</button>
+
+    <!-- Event Creation Modal -->
+    <div id="eventModalContainer" class="modal-container">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>Create New Sport Event</h2>
+            <form id="createEventForm">
+                <div class="form-group">
+                    <label for="eventName">Event Name:</label>
+                    <input type="text" id="eventName" required>
+                </div>
+                <div class="form-group">
+                    <label for="sportType">Sport Type:</label>
+                    <input type="text" id="sportType" required>
+                </div>
+                <div class="form-group">
+                    <label for="eventDate">Date & Time:</label>
+                    <input type="datetime-local" id="eventDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="eventCity">City:</label>
+                    <input type="text" id="eventCity" required>
+                </div>
+                <div class="form-group">
+                    <label for="playerList">Player List (comma separated):</label>
+                    <textarea id="playerList" rows="3"></textarea>
+                </div>
+                <div class="button-group">
+                    <button type="submit" id="submitEventButton">Create Event</button>
+                    <button type="button" id="sendInviteButton">Send Invite</button>
+                </div>
+            </form>
         </div>
-        <div id="calendar"></div>
     </div>
-</div>
-    </div>
-    <script src="/js/dashboard.js"></script>
-    <script src="/js/calendarView.js"></script>
+
+    <!-- Scripts -->
     <script src="/js/datamodel.js"></script>
+<script src="/js/calendarView.js"></script>
+<script src="/js/topNavigation.js"></script>
+<script src="/js/dashboard.js"></script>
 </body>
 </html>

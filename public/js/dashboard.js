@@ -1,3 +1,4 @@
+//dashboard.js
 ////////////////////////////////////////////////////////////////
 //DASHBOARD.JS
 //THIS IS YOUR "CONTROLLER", IT ACTS AS THE MIDDLEMAN
@@ -15,52 +16,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const logoutButton = document.getElementById('logoutButton');
     const refreshButton = document.getElementById('refreshButton');
     const listUsersButton = document.getElementById('listUsersButton');
-    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabButtons = document.querySelectorAll('.menu-link[data-tab]');
    
-    // Add Create Event button
-    const createEventButton = document.createElement('button');
-    createEventButton.id = 'createEventButton';
-    createEventButton.textContent = 'Create Event';
-    document.querySelector('.header div').prepend(createEventButton);
+    // Create Event button is now part of the new layout
+    const createEventButton = document.getElementById('createEventButton');
 
-    // Create the modal container (but don't show it yet)
-    const modalContainer = document.createElement('div');
-    modalContainer.id = 'eventModalContainer';
-    modalContainer.className = 'modal-container';
-    modalContainer.style.display = 'none';
-    modalContainer.innerHTML = `
-      <div class="modal-content">
-        <span class="close-button">&times;</span>
-        <h2>Create New Sport Event</h2>
-        <form id="createEventForm">
-          <div class="form-group">
-            <label for="eventName">Event Name:</label>
-            <input type="text" id="eventName" required>
-          </div>
-          <div class="form-group">
-            <label for="sportType">Sport Type:</label>
-            <input type="text" id="sportType" required>
-          </div>
-          <div class="form-group">
-            <label for="eventDate">Date & Time:</label>
-            <input type="datetime-local" id="eventDate" required>
-          </div>
-          <div class="form-group">
-            <label for="eventCity">City:</label>
-            <input type="text" id="eventCity" required>
-          </div>
-          <div class="form-group">
-            <label for="playerList">Player List (comma separated):</label>
-            <textarea id="playerList" rows="3"></textarea>
-          </div>
-          <div class="button-group">
-            <button type="submit" id="submitEventButton">Create Event</button>
-            <button type="button" id="sendInviteButton">Send Invite</button>
-          </div>
-        </form>
-      </div>
-    `;
-    document.body.appendChild(modalContainer);
+    // Get modal container
+    const modalContainer = document.getElementById('eventModalContainer');
     //////////////////////////////////////////
     //END ELEMENTS TO ATTACH EVENT LISTENERS
     //////////////////////////////////////////
@@ -70,9 +32,11 @@ document.addEventListener('DOMContentLoaded', () => {
     //EVENT LISTENERS
     //////////////////////////////////////////
     // Add event listener for Create Event button
-    createEventButton.addEventListener('click', () => {
-        modalContainer.style.display = 'flex';
-    });
+    if (createEventButton) {
+        createEventButton.addEventListener('click', () => {
+            modalContainer.style.display = 'flex';
+        });
+    }
 
     // Close the modal when clicking the close button
     document.querySelector('.close-button').addEventListener('click', () => {
@@ -104,7 +68,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert('Event created successfully!');
                 modalContainer.style.display = 'none';
                 // Refresh the events list
-                if (document.querySelector('.tab-button.active').dataset.tab === 'events') {
+                const activeTab = document.querySelector('.menu-item.active .menu-link');
+                if (activeTab && activeTab.getAttribute('data-tab') === 'events') {
                     await loadEvents();
                 }
                 // Reset form
@@ -124,49 +89,100 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Log out and redirect to login
-    logoutButton.addEventListener('click', () => {
-        // Clear all authentication data
-        localStorage.removeItem('jwtToken');
-        
-        // Force redirect to login page, preventing back navigation
-        window.location.replace('/');
-        
-        // For extra security, return false to prevent default action
-        return false;
-    });
+    if (logoutButton) {
+        logoutButton.addEventListener('click', () => {
+            // Clear all authentication data
+            localStorage.removeItem('jwtToken');
+            
+            // Force redirect to login page, preventing back navigation
+            window.location.replace('/');
+            
+            // For extra security, return false to prevent default action
+            return false;
+        });
+    }
 
     // Refresh list when the button is clicked
-    refreshButton.addEventListener('click', async () => {
-        // Refresh the currently active tab
-        const activeTab = document.querySelector('.tab-button.active');
-        if (activeTab) {
-            switchTab(activeTab.dataset.tab);
-        }
-    });
+    if (refreshButton) {
+        refreshButton.addEventListener('click', async () => {
+            // Refresh the currently active tab
+            const activeMenuItem = document.querySelector('.menu-item.active');
+            if (activeMenuItem) {
+                const activeLink = activeMenuItem.querySelector('.menu-link');
+                if (activeLink) {
+                    switchTab(activeLink.getAttribute('data-tab'));
+                }
+            }
+        });
+    }
 
     // List Users button click event
-    listUsersButton.addEventListener('click', async () => {
-        console.log('List Users button clicked');
-        try {
-            await renderUserList();
-        } catch (error) {
-            console.error('Error rendering user list:', error);
-        }
-    });
+    if (listUsersButton) {
+        listUsersButton.addEventListener('click', async () => {
+            console.log('List Users button clicked');
+            try {
+                await renderUserList();
+                
+                // Update the active tab in the sidebar
+                tabButtons.forEach(button => {
+                    const menuItem = button.closest('.menu-item');
+                    const iconContainer = button.querySelector('.icon-container');
+                    
+                    if (button.getAttribute('data-tab') === 'users') {
+                        menuItem.classList.add('active');
+                        if (iconContainer) iconContainer.classList.add('active-icon');
+                    } else {
+                        menuItem.classList.remove('active');
+                        if (iconContainer) iconContainer.classList.remove('active-icon');
+                    }
+                });
+            } catch (error) {
+                console.error('Error rendering user list:', error);
+            }
+        });
+    }
 
-    // Tab switching event listener
+    // Tab switching event listener for sidebar menu
     tabButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            // Remove active class from all buttons and tabs
-            tabButtons.forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+        button.addEventListener('click', (e) => {
+            e.preventDefault();
             
-            // Add active class to clicked button and corresponding tab
-            button.classList.add('active');
-            document.getElementById(`${button.dataset.tab}-tab`).classList.add('active');
+            // Remove active class from all menu items
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Remove active class from all icon containers
+            document.querySelectorAll('.icon-container').forEach(icon => {
+                icon.classList.remove('active-icon');
+            });
+            
+            // Add active class to clicked menu item
+            const menuItem = button.closest('.menu-item');
+            if (menuItem) {
+                menuItem.classList.add('active');
+            }
+            
+            // Add active class to icon container
+            const iconContainer = button.querySelector('.icon-container');
+            if (iconContainer) {
+                iconContainer.classList.add('active-icon');
+            }
+            
+            // Hide all tab panes
+            document.querySelectorAll('.tab-pane').forEach(pane => {
+                pane.classList.remove('active');
+            });
+            
+            // Show the selected tab pane
+            const tabId = button.getAttribute('data-tab');
+            const tabPane = document.getElementById(`${tabId}-tab`);
+            if (tabPane) {
+                tabPane.classList.add('active');
+            }
             
             // Load content for the tab
-            switchTab(button.dataset.tab);
+            switchTab(tabId);
         });
     });
     //////////////////////////////////////////
@@ -183,8 +199,26 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location.href = '/';
     } else {
         DataModel.setToken(token);
-        // Load initial tab (Events)
-        switchTab('events');
+
+        initTopNavigation('#top-nav-container', {
+        quote: "Champions keep playing until they get it right.",
+        tabSwitchFn: switchTab  // Your existing tab switching function
+});
+        
+        // Find the active menu item
+        const activeMenuItem = document.querySelector('.menu-item.active');
+        if (activeMenuItem) {
+            const activeLink = activeMenuItem.querySelector('.menu-link');
+            if (activeLink && activeLink.getAttribute('data-tab')) {
+                switchTab(activeLink.getAttribute('data-tab'));
+            } else {
+                // Default to events tab if no active tab
+                switchTab('events');
+            }
+        } else {
+            // Default to events tab if no active tab
+            switchTab('events');
+        }
     }
     //////////////////////////////////////////
     //END CODE THAT NEEDS TO RUN IMMEDIATELY AFTER PAGE LOADS
@@ -385,32 +419,18 @@ async function loadProfile() {
     }
 }
 
-// Calendar functionality
+// Let the calendar function be handled by calendarView.js
 async function loadCalendar() {
-    console.log('Loading calendar view');
-    // Get calendar container
-    const calendarElement = document.getElementById('calendar');
-    calendarElement.innerHTML = '<div class="loading-message">Loading calendar...</div>';
+    console.log('Dashboard loadCalendar');
     
-    try {
-        // Fetch all events initially
-        const events = await DataModel.getEvents();
-        
-        // Also fetch joined events to know which ones the user has already joined
-        const joinedEvents = await DataModel.getJoinedEvents();
-        const joinedEventIds = joinedEvents.map(event => event.event_id);
-        
-        // Populate sport and location filters with unique values
-        populateFilters(events);
-        
-        // Set up filter event handlers
-        setupFilterHandlers(events, joinedEventIds);
-        
-        // Initial calendar render
-        renderCalendar(new Date(), events, joinedEventIds);
-    } catch (error) {
-        console.error('Error loading calendar:', error);
-        calendarElement.innerHTML = '<div class="error-message">Failed to load calendar. Please try again later.</div>';
+    // Call the renamed global function from calendarView.js
+    if (typeof window.initializeCalendar === 'function') {
+        await window.initializeCalendar();
+    } else {
+        const calendarElement = document.getElementById('calendar');
+        if (calendarElement) {
+            calendarElement.innerHTML = '<div class="error-message">Calendar functionality not available.</div>';
+        }
     }
 }
 

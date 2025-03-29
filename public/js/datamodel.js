@@ -96,238 +96,234 @@ const DataModel = (function () {
             }
         },
 
-        // Add these functions to your existing DataModel object
-// Inside the return {...} block in datamodel.js
-
-// Create a new event
-createEvent: async function(eventData) {
-    if (!token) {
-        console.error("Token is not set.");
-        return null;
-    }
-
-    try {
-        const response = await fetch('/api/events', {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(eventData)
-        });
-
-        if (!response.ok) {
-            console.error("Error creating event:", await response.json());
-            return null;
-        }
-
-        return await response.json();
-    } catch (error) {
-        console.error("Error creating event:", error);
-        return null;
-    }
-},
-
-// Get all events
-getEvents: async function() {
-    if (!token) {
-        console.error("Token is not set.");
-        return [];
-    }
-
-    try {
-        const response = await fetch('/api/events', {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json',
+        // Create a new event
+        createEvent: async function(eventData) {
+            if (!token) {
+                console.error("Token is not set.");
+                return null;
             }
-        });
 
-        if (!response.ok) {
-            console.error("Error fetching events:", await response.json());
-            return [];
-        }
+            try {
+                const response = await fetch('/api/events', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(eventData)
+                });
 
-        const data = await response.json();
-        return data.events || [];
-    } catch (error) {
-        console.error("Error fetching events:", error);
-        return [];
-    }
-},
+                if (!response.ok) {
+                    console.error("Error creating event:", await response.json());
+                    return null;
+                }
 
-// Get events created by the current user
-getMyEvents: async function() {
-    if (!token) {
-        console.error("Token is not set.");
-        return [];
-    }
-
-    try {
-        const response = await fetch('/api/events/my-events', {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json',
+                return await response.json();
+            } catch (error) {
+                console.error("Error creating event:", error);
+                return null;
             }
-        });
+        },
 
-        if (!response.ok) {
-            console.error("Error fetching my events:", await response.json());
-            return [];
-        }
-
-        const data = await response.json();
-        return data.events || [];
-    } catch (error) {
-        console.error("Error fetching my events:", error);
-        return [];
-    }
-},
-
-// Get a specific event by ID
-getEventById: async function(eventId) {
-    if (!token) {
-        console.error("Token is not set.");
-        return null;
-    }
-
-    try {
-        const response = await fetch(`/api/events/${eventId}`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json',
+        // Get all events
+        getEvents: async function() {
+            if (!token) {
+                console.error("Token is not set.");
+                return [];
             }
-        });
 
-        if (!response.ok) {
-            console.error("Error fetching event:", await response.json());
-            return null;
-        }
+            try {
+                const response = await fetch('/api/events', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    }
+                });
 
-        const data = await response.json();
-        return data.event || null;
-    } catch (error) {
-        console.error("Error fetching event:", error);
-        return null;
-    }
-},
-// Join an event
-joinEvent: async function(eventId) {
-    if (!token) {
-        console.error("Token is not set.");
-        return null;
-    }
+                if (!response.ok) {
+                    console.error("Error fetching events:", await response.json());
+                    return [];
+                }
 
-    try {
-        const response = await fetch(`/api/events/${eventId}/join`, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json',
+                const data = await response.json();
+                return data.events || [];
+            } catch (error) {
+                console.error("Error fetching events:", error);
+                return [];
             }
-        });
+        },
 
-        if (!response.ok) {
-            console.error("Error joining event:", await response.json());
-            return null;
-        }
-
-        return await response.json();
-    } catch (error) {
-        console.error("Error joining event:", error);
-        return null;
-    }
-},
-
-// Get events the user has joined
-getJoinedEvents: async function() {
-    if (!token) {
-        console.error("Token is not set.");
-        return [];
-    }
-
-    try {
-        const response = await fetch('/api/events/joined', {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json',
+        // Get events created by the current user
+        getMyEvents: async function() {
+            if (!token) {
+                console.error("Token is not set.");
+                return [];
             }
-        });
 
-        if (!response.ok) {
-            console.error("Error fetching joined events:", await response.json());
-            return [];
-        }
+            try {
+                const response = await fetch('/api/events/my-events', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    }
+                });
 
-        const data = await response.json();
-        return data.events || [];
-    } catch (error) {
-        console.error("Error fetching joined events:", error);
-        return [];
-    }
-},
+                if (!response.ok) {
+                    console.error("Error fetching my events:", await response.json());
+                    return [];
+                }
 
-// Check if user has joined a specific event
-checkEventJoined: async function(eventId) {
-    if (!token) {
-        console.error("Token is not set.");
-        return false;
-    }
-
-    try {
-        const response = await fetch(`/api/events/${eventId}/joined`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json',
+                const data = await response.json();
+                return data.events || [];
+            } catch (error) {
+                console.error("Error fetching my events:", error);
+                return [];
             }
-        });
+        },
 
-        if (!response.ok) {
-            console.error("Error checking event status:", await response.json());
-            return false;
-        }
-
-        const data = await response.json();
-        return data.joined || false;
-    } catch (error) {
-        console.error("Error checking event status:", error);
-        return false;
-    }
-},
-// Add this to your DataModel object inside datamodel.js
-getEventParticipants: async function(eventId) {
-    if (!token) {
-        console.error("Token is not set.");
-        return [];
-    }
-
-    try {
-        const response = await fetch(`/api/events/${eventId}/participants`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json',
+        // Get a specific event by ID
+        getEventById: async function(eventId) {
+            if (!token) {
+                console.error("Token is not set.");
+                return null;
             }
-        });
 
-        if (!response.ok) {
-            console.error("Error fetching event participants:", await response.json());
-            return [];
-        }
+            try {
+                const response = await fetch(`/api/events/${eventId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    }
+                });
 
-        const data = await response.json();
-        return data.participants || [];
-    } catch (error) {
-        console.error("Error fetching event participants:", error);
-        return [];
-    }
-}
+                if (!response.ok) {
+                    console.error("Error fetching event:", await response.json());
+                    return null;
+                }
 
+                const data = await response.json();
+                return data.event || null;
+            } catch (error) {
+                console.error("Error fetching event:", error);
+                return null;
+            }
+        },
+	// Join an event
+        joinEvent: async function(eventId) {
+            if (!token) {
+                console.error("Token is not set.");
+                return null;
+            }
+
+            try {
+                const response = await fetch(`/api/events/${eventId}/join`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                if (!response.ok) {
+                    console.error("Error joining event:", await response.json());
+                    return null;
+                }
+
+                return await response.json();
+            } catch (error) {
+                console.error("Error joining event:", error);
+                return null;
+            }
+        },
+
+        // Get events the user has joined
+        getJoinedEvents: async function() {
+            if (!token) {
+                console.error("Token is not set.");
+                return [];
+            }
+
+            try {
+                const response = await fetch('/api/events/joined', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                if (!response.ok) {
+                    console.error("Error fetching joined events:", await response.json());
+                    return [];
+                }
+
+                const data = await response.json();
+                return data.events || [];
+            } catch (error) {
+                console.error("Error fetching joined events:", error);
+                return [];
+            }
+        },
+
+        // Check if user has joined a specific event
+        checkEventJoined: async function(eventId) {
+            if (!token) {
+                console.error("Token is not set.");
+                return false;
+            }
+
+            try {
+                const response = await fetch(`/api/events/${eventId}/joined`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                if (!response.ok) {
+                    console.error("Error checking event status:", await response.json());
+                    return false;
+                }
+
+                const data = await response.json();
+                return data.joined || false;
+            } catch (error) {
+                console.error("Error checking event status:", error);
+                return false;
+            }
+        },
         
+        // Get event participants
+        getEventParticipants: async function(eventId) {
+            if (!token) {
+                console.error("Token is not set.");
+                return [];
+            }
+
+            try {
+                const response = await fetch(`/api/events/${eventId}/participants`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                if (!response.ok) {
+                    console.error("Error fetching event participants:", await response.json());
+                    return [];
+                }
+
+                const data = await response.json();
+                return data.participants || [];
+            } catch (error) {
+                console.error("Error fetching event participants:", error);
+                return [];
+            }
+        }
     };
 })();

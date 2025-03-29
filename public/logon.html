@@ -5,51 +5,154 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Logon - Sports Social App</title>
+    <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/logon.css">
 </head>
 
 <body>
-    <div class="container">
-        <h1>Sports Social App</h1>
-        <div class="tab">
-            <button class="tab-button active" id="login-tab">Logon</button>
-            <button class="tab-button" id="create-account-tab">Create Account</button>
-        </div>
+    <!-- Background Slideshow -->
+    <div class="slideshow-container">
+        <!-- PLACEHOLDER: Add background slideshow images here -->
+        <div class="slideshow-slide active" style="background-image: url('https://images.pexels.com/photos/163452/basketball-dunk-blue-game-163452.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2');"></div>
+        <div class="slideshow-slide active" style="background-image: url('https://images.pexels.com/photos/46798/the-ball-stadion-football-the-pitch-46798.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2');"></div>
+        <div class="slideshow-slide active" style="background-image: url('https://images.pexels.com/photos/449609/pexels-photo-449609.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2');"></div>
+    </div>
 
-        <div id="form-container">
-            <!-- Logon Form -->
-            <form id="logon-form" class="active-form">
-                <label for="login-email">Username:</label>
-                <input type="text" id="login-email" placeholder="Enter your username" required>
+    <div class="page-container">
+        <!-- Auth Container (Left Side) -->
+        <main class="login-container">
+            <header class="login-header">
+                <div class="logo-wrapper">
+                    <!-- PLACEHOLDER: Add sports social app logo image here -->
+                    <div class="brand-logo">Sports Social App</div>
+                </div>
+                <div class="header-content">
+                    <h1 class="login-title">Let's Get You Back in the Game!</h1>
+                    <p class="login-subtitle">
+                        Log in to connect with other sports fans, share updates, and never miss a game
+                    </p>
+                </div>
+            </header>
 
-                <label for="login-password">Password:</label>
-                <input type="password" id="login-password" placeholder="Enter your password" required>
+            <section class="login-form-section">
+                <div class="tab">
+                    <button class="tab-button active" id="login-tab">Logon</button>
+                    <button class="tab-button" id="create-account-tab">Create Account</button>
+                </div>
 
-                <button type="submit" class="button">Logon</button>
-            </form>
+                <div id="form-container">
+                    <!-- Social Login Options -->
+                    <div class="social-login-options">
+                        <button class="social-login-button google-login" aria-label="Log in with Google">
+                            <!-- PLACEHOLDER: Add Google icon here -->
+                            <span class="social-icon-placeholder">G</span>
+                            <span class="social-button-text">Log In with Google</span>
+                        </button>
+                        <button class="social-login-button apple-login" aria-label="Log in with Apple">
+                            <!-- PLACEHOLDER: Add Apple icon here -->
+                            <span class="social-icon-placeholder">A</span>
+                            <span class="social-button-text">Log In with Apple</span>
+                        </button>
+                    </div>
 
-            <!-- Create Account Form -->
-            <form id="create-account-form">
-                <label for="create-username">Username:</label>
-                <input type="text" id="create-username" placeholder="Choose a username" required>
+                    <div class="divider">
+                        <div class="divider-line"></div>
+                        <span class="divider-text">or continue with email</span>
+                        <div class="divider-line"></div>
+                    </div>
 
-                <label for="create-email">Email:</label>
-                <input type="email" id="create-email" placeholder="Enter your email" required>
+                    <!-- Logon Form -->
+                    <form id="logon-form" class="active-form">
+                        <div class="form-field">
+                            <label for="login-email" class="field-label">Username:</label>
+                            <div class="input-container">
+                                <input type="text" id="login-email" placeholder="Enter your username" required 
+                                    class="form-input">
+                            </div>
+                        </div>
 
-                <label for="create-fullname">Full Name:</label>
-                <input type="text" id="create-fullname" placeholder="Enter your full name" required>
+                        <div class="form-field">
+                            <label for="login-password" class="field-label">Password:</label>
+                            <div class="input-container">
+                                <input type="password" id="login-password" placeholder="Enter your password" required 
+                                    class="form-input">
+                                <button type="button" class="toggle-password" aria-label="Toggle password visibility">
+                                    <!-- PLACEHOLDER: Add eye icon here -->
+                                    <span class="eye-icon-placeholder">👁</span>
+                                </button>
+                            </div>
+                        </div>
 
-                <label for="create-password">Password:</label>
-                <input type="password" id="create-password" placeholder="Create your password" required>
+                        <a href="#" class="forgot-password">Forgot your password?</a>
+                        <button type="submit" class="submit-button">Logon</button>
+                    </form>
 
-                <button type="submit" class="button">Create Account</button>
-            </form>
+                    <!-- Create Account Form -->
+                    <form id="create-account-form">
+                        <div class="form-field">
+                            <label for="create-username" class="field-label">Username:</label>
+                            <div class="input-container">
+                                <input type="text" id="create-username" placeholder="Choose a username" required 
+                                    class="form-input">
+                            </div>
+                        </div>
 
-            <p id="message" class="message"></p>
+                        <div class="form-field">
+                            <label for="create-email" class="field-label">Email:</label>
+                            <div class="input-container">
+                                <input type="email" id="create-email" placeholder="Enter your email" required 
+                                    class="form-input">
+                            </div>
+                        </div>
+
+                        <div class="form-field">
+                            <label for="create-fullname" class="field-label">Full Name:</label>
+                            <div class="input-container">
+                                <input type="text" id="create-fullname" placeholder="Enter your full name" required 
+                                    class="form-input">
+                            </div>
+                        </div>
+
+                        <div class="form-field">
+                            <label for="create-password" class="field-label">Password:</label>
+                            <div class="input-container">
+                                <input type="password" id="create-password" placeholder="Create your password" required 
+                                    class="form-input">
+                                <button type="button" class="toggle-password" aria-label="Toggle password visibility">
+                                    <!-- PLACEHOLDER: Add eye icon here -->
+                                    <span class="eye-icon-placeholder">👁</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="submit-button">Create Account</button>
+                    </form>
+                </div>
+            </section>
+
+            <footer class="login-footer">
+                <p class="signup-prompt">Don't have an account?</p>
+                <a href="#" class="signup-link">Sign Up</a>
+            </footer>
+        </main>
+
+        <!-- Bottom Right Info Container -->
+        <div class="feature-info-container">
+            <div class="feature-text">
+                <h2>Connect with other sports fans</h2>
+                <p>Join discussions, share game highlights, and follow your favorite teams all in one place.</p>
+            </div>
+            
+            <div class="slideshow-dots">
+                <span class="dot active"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+            </div>
         </div>
     </div>
 
     <script src="js/logon.js"></script>
+    <script src="js/slideShow.js"></script>
 </body>
 
 </html>
