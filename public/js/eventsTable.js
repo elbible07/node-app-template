@@ -227,6 +227,12 @@ class EventsTable {
                 statusText = 'Full';
                 statusClass = 'full';
             }
+
+            const currentDate = new Date();
+            if (eventDate < currentDate) {
+                statusText = 'Passed';
+                statusClass = 'passed';
+            }
             
             row.innerHTML = `
                 <td class="checkbox-cell">

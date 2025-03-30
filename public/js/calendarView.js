@@ -279,6 +279,8 @@ function renderCalendar(date, events, joinedEventIds) {
             });
             
             // Add events to the day cell
+            // Modify the calendar event creation code in renderCalendar()
+
             if (dayEvents.length > 0) {
                 dayEvents.forEach(event => {
                     const eventDiv = document.createElement('div');
@@ -289,8 +291,16 @@ function renderCalendar(date, events, joinedEventIds) {
                         eventDiv.classList.add('joined-event');
                     }
                     
-                    // Format time
+                    // Check if event has passed
                     const eventDate = new Date(event.event_date);
+                    const currentDate = new Date();
+                    const isPastEvent = eventDate < currentDate;
+                    
+                    if (isPastEvent) {
+                        eventDiv.classList.add('past-event');
+                    }
+                    
+                    // Format time
                     const timeStr = eventDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                     
                     eventDiv.innerHTML = `
@@ -298,8 +308,18 @@ function renderCalendar(date, events, joinedEventIds) {
                         <span class="event-sport">${event.sport_type}</span>
                     `;
                     
-                    // Add click handler to show event details
-                    eventDiv.addEventListener('click', () => showEventDetails(event, joinedEventIds.includes(event.event_id)));
+                    // Only add click handler if event hasn't passed
+                    if (!isPastEvent) {
+                        eventDiv.addEventListener('click', () => showEventDetails(event, joinedEventIds.includes(event.event_id)));
+                    } else {
+                        // For past events, show a different message or behavior when clicked
+                        eventDiv.addEventListener('click', () => {
+                            alert('This event has already passed.');
+                        });
+                        
+                        // Optional: change cursor style to indicate it's not fully interactive
+                        eventDiv.style.cursor = 'default';
+                    }
                     
                     eventsDiv.appendChild(eventDiv);
                 });

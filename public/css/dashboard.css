@@ -416,66 +416,110 @@ body {
 }
 
 /* Calendar Styles */
+/* Enhanced Calendar Filters with better spacing and alignment */
 .calendar-filters {
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
-  margin-bottom: 20px;
-  padding: 20px;
-  background-color: #f9f9f9;
+  gap: 30px;
+  margin-bottom: 30px;
+  padding: 30px;
+  background-color: white;
   border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  align-items: flex-end; /* This aligns items at their bottom edge */
 }
 
 .filter-group {
-  margin-right: 20px;
-  margin-bottom: 10px;
+  margin-right: 0;
+  margin-bottom: 0;
+  display: flex;
+  flex-direction: column;
+  min-width: 160px;
 }
 
 .filter-group label {
   display: block;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
   font-weight: 600;
+  color: #444;
+  font-size: 14px;
 }
 
-.filter-group select, .filter-group input[type="checkbox"] {
-  padding: 8px 12px;
-  border-radius: 6px;
+.filter-group select {
+  padding: 12px 18px;
+  border-radius: 10px;
   border: 1px solid #e0e0e0;
   font-family: "Urbanist", sans-serif;
+  min-width: 160px;
+  background-color: #f9f9f9;
+  transition: all 0.2s ease;
 }
 
-#calendarControls {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
+.filter-group select:hover {
+  border-color: #4caf50;
 }
 
-#calendarControls button {
-  background-color: #f5f5f5;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-  font-family: "Urbanist", sans-serif;
-  transition: background-color 0.2s ease;
+.filter-group:first-child {
+  align-self: center; /* Centers the checkbox group */
+}
+
+.filter-group input[type="checkbox"] {
+  margin-right: 10px;
+  transform: scale(1.2);
+  accent-color: #4caf50;
 }
 
 #applyFilters {
   background-color: #4caf50;
   color: white;
   border: none;
-  padding: 10px 20px;
-  border-radius: 8px;
+  padding: 12px 28px;
+  height: 45px; /* Fixed height to align with dropdowns */
+  border-radius: 10px;
   cursor: pointer;
   font-weight: 600;
   font-family: "Urbanist", sans-serif;
-  transition: background-color 0.2s ease;
+  transition: all 0.2s ease;
+  box-shadow: 0 3px 8px rgba(76, 175, 80, 0.25);
+  margin-left: auto; /* Pushes the button to the right */
 }
 
 #applyFilters:hover {
   background-color: #3d8b40;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 10px rgba(76, 175, 80, 0.3);
+}
+
+/* Calendar controls with better spacing */
+#calendarControls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 30px 0;
+  padding: 0 10px;
+}
+
+#calendarControls button {
+  background-color: white;
+  border: 1px solid #e0e0e0;
+  padding: 12px 24px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  font-family: "Urbanist", sans-serif;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+#calendarControls button:hover {
+  background-color: #f9f9f9;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+}
+
+#currentMonthYear {
+  font-size: 26px;
+  font-weight: 700;
 }
 
 .calendar-table {
@@ -734,4 +778,31 @@ body {
   .button-group button {
     width: 100%;
   }
+}
+
+/* Add this to your dashboard.css file with the other calendar-event styles */
+
+.calendar-event.past-event:hover {
+  background-color: #e0e0e0;
+}
+
+/* Ensure event text remains dark even on grey "other month" days */
+.other-month .calendar-event {
+  color: #121212; /* This ensures text inside events stays dark */
+}
+
+.other-month .calendar-event .event-sport {
+  color: #666; /* Keep the sport type in its original color */
+}
+
+/* Keep past events greyed out regardless of which month they're in */
+.calendar-event.past-event {
+  background-color: #f0f0f0;
+  border-left: 3px solid #9e9e9e;
+  color: #757575;
+  opacity: 0.7;
+}
+
+.calendar-event.past-event .event-sport {
+  color: #757575;
 }

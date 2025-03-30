@@ -196,6 +196,12 @@
   color: #ef4444;
 }
 
+/* Add this to your events-table.css file with the other status badges */
+.status-badge.passed {
+  background-color: #ffebee;
+  color: #ef5350;
+}
+
 /* Action Cell */
 .action-cell .table-cell {
   display: flex;
