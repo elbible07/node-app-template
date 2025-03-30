@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const result = await response.json();
             if (response.ok) {
                 messageEl.textContent = 'Account created successfully! You can now log in.';
-                messageEl.classList.add('success');
+                messageEl.className = 'message success';
                 document.getElementById('login-email').value = username;
                 document.getElementById('login-password').value = password;
                 logonForm.classList.add('active-form');

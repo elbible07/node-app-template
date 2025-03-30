@@ -7,6 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/events-table.css">
 </head>
 <body>
     <div class="app-container">
@@ -125,11 +126,112 @@
             <!-- Tab Content -->
             <div class="tab-content">
                 <!-- Events Tab -->
+                <!-- Replace the current events-tab div content with this -->
                 <div id="events-tab" class="tab-pane active">
-                    <h2>Upcoming Events / Users</h2>
-                    <div id="eventsList"></div>
-                </div>
+                    <div class="card-events-table">
+                        <header class="table-header-container">
+                            <h2 class="title-card">Events Table</h2>
+                            <div class="table-filters">
+                                <div class="filter-group">
+                                    <select id="sportFilterTable" class="filter-select">
+                                        <option value="">All Sports</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <select id="locationFilterTable" class="filter-select">
+                                        <option value="">All Locations</option>
+                                    </select>
+                                </div>
+                                <button id="applyTableFilters" class="filter-button">
+                                    <i class="fa-solid fa-filter"></i> Apply Filters
+                                </button>
+                                <button id="downloadEvents" class="action-button secondary-button">
+                                    <i class="fa-solid fa-download"></i>
+                                </button>
+                                <button id="refreshEvents" class="action-button">
+                                    <i class="fa-solid fa-arrows-rotate"></i>
+                                </button>
+                            </div>
+                        </header>
 
+                        <div class="table-container" role="region" aria-label="Events data table" tabindex="0">
+                            <table class="events-table">
+                                <thead>
+                                    <tr>
+                                        <th class="checkbox-header">
+                                            <div class="table-header-content">
+                                                <input type="checkbox" id="select-all-events" aria-label="Select all events">
+                                            </div>
+                                        </th>
+                                        <th class="event-name-header">
+                                            <div class="table-header-content">Event Name</div>
+                                        </th>
+                                        <th class="sport-header">
+                                            <div class="table-header-content">Sport</div>
+                                        </th>
+                                        <th class="date-header">
+                                            <div class="table-header-content">Date</div>
+                                        </th>
+                                        <th class="time-header">
+                                            <div class="table-header-content">Time</div>
+                                        </th>
+                                        <th class="location-header">
+                                            <div class="table-header-content">Location</div>
+                                        </th>
+                                        <th class="creator-header">
+                                            <div class="table-header-content">Created By</div>
+                                        </th>
+                                        <th class="players-header">
+                                            <div class="table-header-content">Players</div>
+                                        </th>
+                                        <th class="status-header">
+                                            <div class="table-header-content">Status</div>
+                                        </th>
+                                        <th class="action-header">
+                                            <div class="table-header-content"></div>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody id="events-table-body">
+                                    <!-- Events will be dynamically added here -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination -->
+                        <footer class="pagination-container">
+                            <div class="pagination-info">
+                                <label for="events-per-page" class="show-data">Show</label>
+                                <div class="per-page-select">
+                                    <select id="events-per-page" class="per-page-dropdown">
+                                        <option value="5">5</option>
+                                        <option value="10" selected>10</option>
+                                        <option value="20">20</option>
+                                        <option value="50">50</option>
+                                    </select>
+                                </div>
+                                <span class="pagination-text">events per page</span>
+                            </div>
+                            <div class="pagination-controls" role="navigation" aria-label="Pagination">
+                                <button id="first-page" class="pagination-button" aria-label="First page">
+                                    <i class="fa-solid fa-angles-left"></i>
+                                </button>
+                                <button id="prev-page" class="pagination-button" aria-label="Previous page">
+                                    <i class="fa-solid fa-angle-left"></i>
+                                </button>
+                                <div id="pagination-numbers" class="pagination-numbers">
+                                    <!-- Page numbers will be dynamically added here -->
+                                </div>
+                                <button id="next-page" class="pagination-button" aria-label="Next page">
+                                    <i class="fa-solid fa-angle-right"></i>
+                                </button>
+                                <button id="last-page" class="pagination-button" aria-label="Last page">
+                                    <i class="fa-solid fa-angles-right"></i>
+                                </button>
+                            </div>
+                        </footer>
+                    </div>
+                </div>
                 <!-- Teams Tab -->
                 <div id="teams-tab" class="tab-pane">
                     <h2>My Teams</h2>
@@ -236,6 +338,7 @@
 
     <!-- Scripts -->
     <script src="/js/datamodel.js"></script>
+    <script src="/js/eventsTable.js"></script>
 <script src="/js/calendarView.js"></script>
 <script src="/js/topNavigation.js"></script>
 <script src="/js/dashboard.js"></script>

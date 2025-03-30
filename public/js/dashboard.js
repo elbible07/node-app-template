@@ -293,8 +293,7 @@ async function renderUserList() {
     }
 }
 
-// Update the loadEvents function to add "Join Event" buttons
-async function loadEvents() {
+async function loadEventsOriginal() {
     const eventsListElement = document.getElementById('eventsList');
     eventsListElement.innerHTML = '<div class="loading-message">Loading events...</div>';
     
@@ -343,6 +342,25 @@ async function loadEvents() {
     } catch (error) {
         console.error('Error loading events:', error);
         eventsListElement.innerHTML = '<div class="error-message">Failed to load events. Please try again later.</div>';
+    }
+}
+
+async function loadEvents() {
+    // Check if we should use the table view or the original view
+    const useTableView = true; // You can make this configurable later
+    
+    if (useTableView) {
+        // Initialize and load the events table
+        if (typeof window.initEventsTable === 'function') {
+            window.initEventsTable();
+        } else {
+            console.error('Events table initialization function not found');
+            // Fall back to the original view if the table can't be loaded
+            loadEventsOriginal();
+        }
+    } else {
+        // Use the original events view
+        loadEventsOriginal();
     }
 }
 
