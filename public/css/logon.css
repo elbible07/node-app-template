@@ -13,6 +13,10 @@ body {
     color: #121212;
 }
 
+.logo {
+    height: 2rem;
+}
+
 /* Background Slideshow */
 .slideshow-container {
     position: absolute;
@@ -115,17 +119,16 @@ body {
     line-height: 130%;
 }
 
-/* Tab navigation */
 .tab {
     display: flex;
-    justify-content: space-around;
-    margin-bottom: 20px;
+    justify-content: space-between;
+    gap: 20px;
     width: 100%;
 }
 
 .tab-button {
     flex: 1;
-    padding: 12px 0;
+    padding: 12px 16px;
     border: none;
     cursor: pointer;
     background-color: #f5f5f5;
@@ -133,13 +136,15 @@ body {
     font-family: 'Urbanist', sans-serif;
     font-size: 16px;
     font-weight: 600;
-    border-radius: 8px 8px 0 0;
-    transition: all 0.2s ease;
+    border-radius: 999px;
+    transition: all 0.3s ease;
+    height: 48px;
 }
 
 .tab-button.active {
     background-color: #4caf50;
     color: white;
+    box-shadow: 0 4px 8px rgba(76, 175, 80, 0.2);
 }
 
 /* Login form section */
@@ -156,13 +161,15 @@ body {
 }
 
 /* Social login buttons */
+/* Social login buttons */
 .social-login-options {
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 20px;
     width: 100%;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
+    margin-top: 8px;
 }
 
 .social-login-button {
@@ -170,14 +177,35 @@ body {
     padding: 12px 16px;
     justify-content: center;
     align-items: center;
-    gap: 8px;
+    gap: 12px;
     flex: 1;
+    height: 48px;
     border-radius: 999px;
     background-color: #fff5ed;
     border: none;
     cursor: pointer;
     transition: background-color 0.2s ease;
     font-family: 'Urbanist', sans-serif;
+}
+
+/* Add fixed width container for icons to ensure consistent spacing */
+.social-icon-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 24px;
+    height: 24px;
+}
+
+/* Resize the icons to be consistent */
+.apple {
+    width: 20px;
+    height: 24px;
+}
+
+.google {
+    width: 24px;
+    height: 24px;
 }
 
 .social-login-button:hover {
