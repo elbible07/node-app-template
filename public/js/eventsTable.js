@@ -122,6 +122,7 @@ class EventsTable {
     }
     
     // Populate filter dropdowns with unique values
+    // Populate filter dropdowns with unique values
     populateFilters() {
         // Clear existing options except the first one
         while (this.sportFilter.options.length > 1) {
@@ -133,8 +134,20 @@ class EventsTable {
         }
         
         // Get unique sports
-        const sports = [...new Set(this.allEvents.map(event => event.sport_type))];
-        sports.forEach(sport => {
+        const sports = new Set();
+        this.allEvents.forEach(event => {
+            if (event.sport_type) {
+                // Normalize the sport type (trim whitespace and convert to lowercase)
+                const normalizedSport = event.sport_type.trim();
+                sports.add(normalizedSport);
+            }
+        });
+        
+        // Convert set to array and sort alphabetically
+        const sortedSports = Array.from(sports).sort();
+        
+        // Add each sport to the dropdown
+        sortedSports.forEach(sport => {
             const option = document.createElement('option');
             option.value = sport;
             option.textContent = sport;
@@ -142,8 +155,20 @@ class EventsTable {
         });
         
         // Get unique locations (cities)
-        const locations = [...new Set(this.allEvents.map(event => event.city))];
-        locations.forEach(location => {
+        const locations = new Set();
+        this.allEvents.forEach(event => {
+            if (event.city) {
+                // Normalize the city (trim whitespace and convert to lowercase for comparison)
+                const normalizedCity = event.city.trim();
+                locations.add(normalizedCity);
+            }
+        });
+        
+        // Convert set to array and sort alphabetically
+        const sortedLocations = Array.from(locations).sort();
+        
+        // Add each location to the dropdown
+        sortedLocations.forEach(location => {
             const option = document.createElement('option');
             option.value = location;
             option.textContent = location;
