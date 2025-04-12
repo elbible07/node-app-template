@@ -8,7 +8,7 @@ const TeamsModule = (function() {
     // Private variables
     let teamsList = [];
     let teamMembers = {};
-    let currentFilter = 'my-teams'; // Default filter: 'my-teams' or 'all-teams'
+    let currentFilter = 'all-teams'; // Default filter: 'my-teams' or 'all-teams'
     let currentSportFilter = '';
     let currentSearchQuery = '';
     
@@ -68,8 +68,8 @@ const TeamsModule = (function() {
                 <div class="filter-group">
                     <label for="teamsFilterSelect">View:</label>
                     <select id="teamsFilterSelect" class="filter-select">
-                        <option value="my-teams">My Teams</option>
-                        <option value="all-teams">All Teams</option>
+                        <option value="my-teams">All Teams</option>
+                        <option value="all-teams">My Teams</option>
                     </select>
                 </div>
                 <div class="filter-group">
@@ -272,82 +272,107 @@ const TeamsModule = (function() {
     }
     
     // Render teams to the container
-    function renderTeams(teams) {
-        if (!domElements.teamsContainer) return;
+    async function renderTeams(teams) {
+    if (!domElements.teamsContainer) return;
+    
+    if (teams.length === 0) {
+        domElements.teamsContainer.innerHTML = `
+            <div class="no-teams-message">
+                ${currentFilter === 'my-teams' 
+                    ? 'You haven\'t joined any teams yet. Create a team or join existing ones!' 
+                    : 'No teams found matching your filters.'}
+            </div>
+        `;
+        return;
+    }
+    
+    // Clear container
+    domElements.teamsContainer.innerHTML = '<div class="loading-message">Loading teams...</div>';
+    
+    // Create team cards
+    const teamCards = [];
+    
+    for (const team of teams) {
+        // For "all-teams" view, check if user is already a member of this team
+        let isMember = false;
+        let isAdmin = false;
         
-        if (teams.length === 0) {
-            domElements.teamsContainer.innerHTML = `
-                <div class="no-teams-message">
-                    ${currentFilter === 'my-teams' 
-                        ? 'You haven\'t joined any teams yet. Create a team or join existing ones!' 
-                        : 'No teams found matching your filters.'}
-                </div>
-            `;
-            return;
+        if (currentFilter === 'all-teams') {
+            // Check membership for each team
+            try {
+                const membership = await DataModel.checkTeamMembership(team.team_id);
+                isMember = membership.isMember;
+                isAdmin = membership.role === 'admin';
+            } catch (error) {
+                console.error(`Error checking membership for team ${team.team_id}:`, error);
+            }
+        } else {
+            // In "my-teams" view, user is already a member
+            isMember = true;
+            isAdmin = team.user_role === 'admin';
         }
         
-        // Clear container
-        domElements.teamsContainer.innerHTML = '';
+        const teamCard = document.createElement('div');
+        teamCard.className = 'team-card';
+        teamCard.setAttribute('data-team-id', team.team_id);
         
-        // Create team cards
-        teams.forEach(team => {
-            const teamCard = document.createElement('div');
-            teamCard.className = 'team-card';
-            teamCard.setAttribute('data-team-id', team.team_id);
-            
-            // Determine if this is my team (i.e., I'm the creator/admin)
-            const isMyTeam = team.user_role === 'admin';
-            
-            teamCard.innerHTML = `
-                <div class="team-card-header">
-                    <div class="team-logo">
-                        <i class="fa-solid fa-users-rectangle"></i>
-                    </div>
-                    <h3 class="team-name">${team.team_name}</h3>
-                    ${isMyTeam ? '<span class="team-admin-badge">Admin</span>' : ''}
+        teamCard.innerHTML = `
+            <div class="team-card-header">
+                <div class="team-logo">
+                    <i class="fa-solid fa-users-rectangle"></i>
                 </div>
-                <div class="team-card-body">
-                    <div class="team-sport">
-                        <i class="fa-solid fa-trophy"></i> ${team.sport_type}
-                    </div>
-                    <div class="team-location">
-                        <i class="fa-solid fa-location-dot"></i> ${team.city || 'No location'}
-                    </div>
-                    <div class="team-members">
-                        <i class="fa-solid fa-user-group"></i> ${team.member_count} member${team.member_count !== 1 ? 's' : ''}
-                    </div>
-                    <div class="team-description">${team.description || 'No description available'}</div>
+                <h3 class="team-name">${team.team_name}</h3>
+                ${isAdmin ? '<span class="team-admin-badge">Admin</span>' : ''}
+            </div>
+            <div class="team-card-body">
+                <div class="team-sport">
+                    <i class="fa-solid fa-trophy"></i> ${team.sport_type}
                 </div>
-                <div class="team-card-footer">
-                    <button class="view-team-btn action-button" data-team-id="${team.team_id}">
-                        View Details
-                    </button>
-                    ${currentFilter === 'all-teams' && !isMyTeam ? 
-                        `<button class="join-team-btn action-button primary-button" data-team-id="${team.team_id}">
-                            Join Team
-                        </button>` : 
-                        ''}
+                <div class="team-location">
+                    <i class="fa-solid fa-location-dot"></i> ${team.city || 'No location'}
                 </div>
-            `;
-            
-            domElements.teamsContainer.appendChild(teamCard);
-        });
+                <div class="team-members">
+                    <i class="fa-solid fa-user-group"></i> ${team.member_count} member${team.member_count !== 1 ? 's' : ''}
+                </div>
+                <div class="team-description">${team.description || 'No description available'}</div>
+            </div>
+            <div class="team-card-footer">
+                <button class="view-team-btn action-button" data-team-id="${team.team_id}">
+                    View Details
+                </button>
+                ${currentFilter === 'all-teams' && !isAdmin ? 
+                    `<button class="join-team-btn action-button ${isMember ? 'joined' : 'primary-button'}" 
+                        data-team-id="${team.team_id}" ${isMember ? 'disabled' : ''}>
+                        ${isMember ? 'Joined' : 'Join Team'}
+                    </button>` : 
+                    ''}
+            </div>
+        `;
         
-        // Add event listeners to team cards
-        document.querySelectorAll('.view-team-btn').forEach(button => {
-            button.addEventListener('click', (e) => {
-                const teamId = e.target.getAttribute('data-team-id');
-                showTeamDetails(teamId);
-            });
-        });
-        
-        document.querySelectorAll('.join-team-btn').forEach(button => {
-            button.addEventListener('click', (e) => {
-                const teamId = e.target.getAttribute('data-team-id');
-                joinTeam(teamId);
-            });
-        });
+        teamCards.push(teamCard);
     }
+    
+    // Clear container and add all team cards
+    domElements.teamsContainer.innerHTML = '';
+    teamCards.forEach(card => {
+        domElements.teamsContainer.appendChild(card);
+    });
+    
+    // Add event listeners to team cards
+    document.querySelectorAll('.view-team-btn').forEach(button => {
+        button.addEventListener('click', (e) => {
+            const teamId = e.target.getAttribute('data-team-id');
+            showTeamDetails(teamId);
+        });
+    });
+    
+    document.querySelectorAll('.join-team-btn:not([disabled])').forEach(button => {
+        button.addEventListener('click', (e) => {
+            const teamId = e.target.getAttribute('data-team-id');
+            joinTeam(teamId);
+        });
+    });
+}
     
     // Handle create team form submission
     async function handleCreateTeam(e) {
@@ -386,23 +411,29 @@ const TeamsModule = (function() {
     
     // Join a team
     async function joinTeam(teamId) {
-        try {
-            const result = await DataModel.joinTeam(teamId);
-            
-            if (result && result.success) {
-                // Reload teams
-                loadTeams();
-                
-                // Show success message
-                alert('You have successfully joined the team!');
-            } else {
-                alert('Failed to join team. Please try again.');
+    try {
+        const result = await DataModel.joinTeam(teamId);
+        
+        if (result && result.success) {
+            // Find and update the join button for this team in the main list
+            const joinBtn = document.querySelector(`.join-team-btn[data-team-id="${teamId}"]`);
+            if (joinBtn) {
+                joinBtn.textContent = 'Joined';
+                joinBtn.classList.add('joined');
+                joinBtn.disabled = true;
+                joinBtn.classList.remove('primary-button');
             }
-        } catch (error) {
-            console.error('Error joining team:', error);
-            alert('An error occurred while joining the team.');
+            
+            // Show success message
+            alert('You have successfully joined the team!');
+        } else {
+            alert('Failed to join team. Please try again.');
         }
+    } catch (error) {
+        console.error('Error joining team:', error);
+        alert('An error occurred while joining the team.');
     }
+}
     
     // Show team details
     async function showTeamDetails(teamId) {
@@ -504,13 +535,45 @@ const TeamsModule = (function() {
             
             // Add event listeners to action buttons
             const joinBtn = document.getElementById('joinTeamFromDetailsBtn');
-            if (joinBtn) {
-                joinBtn.addEventListener('click', async () => {
-                    await joinTeam(team.team_id);
-                    // Refresh details
-                    showTeamDetails(team.team_id);
-                });
-            }
+                if (joinBtn) {
+                    joinBtn.addEventListener('click', async () => {
+                        try {
+                            const result = await DataModel.joinTeam(team.team_id);
+                            
+                            if (result && result.success) {
+                                // Update the button to show joined status
+                                joinBtn.textContent = 'Joined';
+                                joinBtn.classList.add('joined');
+                                joinBtn.classList.remove('primary-button');
+                                joinBtn.disabled = true;
+                                
+                                // Also find and update any join button for this team in the main list
+                                const mainJoinBtn = document.querySelector(`.join-team-btn[data-team-id="${team.team_id}"]`);
+                                if (mainJoinBtn) {
+                                    mainJoinBtn.textContent = 'Joined';
+                                    mainJoinBtn.classList.add('joined');
+                                    mainJoinBtn.classList.remove('primary-button');
+                                    mainJoinBtn.disabled = true;
+                                }
+                                
+                                // Show success message
+                                alert('You have successfully joined the team!');
+                                
+                                // Update the membership status locally so we don't need to refresh
+                                membership.isMember = true;
+                                membership.role = 'member';
+                                
+                                // If we want to refresh the details completely, we can also call:
+                                // showTeamDetails(team.team_id);
+                            } else {
+                                alert('Failed to join team. Please try again.');
+                            }
+                        } catch (error) {
+                            console.error('Error joining team:', error);
+                            alert('An error occurred while joining the team.');
+                        }
+                    });
+                }
             
             const leaveBtn = document.getElementById('leaveTeamBtn');
             if (leaveBtn) {

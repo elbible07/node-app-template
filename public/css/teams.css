@@ -235,6 +235,27 @@
   color: #666;
 }
 
+.join-team-btn.joined {
+    background-color: #cccccc !important;
+    color: #666666 !important;
+    cursor: not-allowed !important;
+}
+
+.join-team-btn.joined,
+.action-button.joined {
+    background-color: #cccccc !important;
+    color: #666666 !important;
+    cursor: not-allowed !important;
+    box-shadow: none !important;
+}
+
+.join-team-btn.joined:hover,
+.action-button.joined:hover {
+    background-color: #cccccc !important;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
 .team-details-info {
   display: flex;
   flex-wrap: wrap;
