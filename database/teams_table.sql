@@ -1,0 +1,15 @@
+USE sports_social_app;
+
+-- Teams Table
+CREATE TABLE IF NOT EXISTS teams (
+  team_id INT AUTO_INCREMENT PRIMARY KEY,
+  creator_id INT NOT NULL,
+  team_name VARCHAR(100) NOT NULL,
+  sport_type VARCHAR(50) NOT NULL,
+  description TEXT,
+  city VARCHAR(100),
+  logo_url VARCHAR(255),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (creator_id) REFERENCES users(user_id) ON DELETE CASCADE
+);

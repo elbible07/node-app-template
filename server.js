@@ -106,9 +106,13 @@ async function authenticateToken(req, res, next) {
 //////////////////////////////////////
 // Import event routes
 const eventRoutes = require('./server/routes/eventRoutes');
+// Import team routes
+const teamRoutes = require('./server/routes/teamRoutes');
 
 // Use event routes with authentication middleware
 app.use('/api/events', authenticateToken, eventRoutes);
+// Use team routes with authentication middleware
+app.use('/api/teams', authenticateToken, teamRoutes);
 
 // Route: Create Account (Register)
 app.post('/api/auth/register', async (req, res) => {

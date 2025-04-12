@@ -324,6 +324,239 @@ const DataModel = (function () {
                 console.error("Error fetching event participants:", error);
                 return [];
             }
+        },
+        
+        createTeam: async function(teamData) {
+            if (!token) {
+                console.error("Token is not set.");
+                return null;
+            }
+
+            try {
+                const response = await fetch('/api/teams', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(teamData)
+                });
+
+                if (!response.ok) {
+                    console.error("Error creating team:", await response.json());
+                    return null;
+                }
+
+                return await response.json();
+            } catch (error) {
+                console.error("Error creating team:", error);
+                return null;
+            }
+        },
+
+        // Get all teams
+        getTeams: async function() {
+            if (!token) {
+                console.error("Token is not set.");
+                return [];
+            }
+
+            try {
+                const response = await fetch('/api/teams', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                if (!response.ok) {
+                    console.error("Error fetching teams:", await response.json());
+                    return [];
+                }
+
+                const data = await response.json();
+                return data.teams || [];
+            } catch (error) {
+                console.error("Error fetching teams:", error);
+                return [];
+            }
+        },
+
+        // Get teams the user is a member of
+        getMyTeams: async function() {
+            if (!token) {
+                console.error("Token is not set.");
+                return [];
+            }
+
+            try {
+                const response = await fetch('/api/teams/my-teams', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                if (!response.ok) {
+                    console.error("Error fetching my teams:", await response.json());
+                    return [];
+                }
+
+                const data = await response.json();
+                return data.teams || [];
+            } catch (error) {
+                console.error("Error fetching my teams:", error);
+                return [];
+            }
+        },
+
+        // Get a specific team by ID
+        getTeamById: async function(teamId) {
+            if (!token) {
+                console.error("Token is not set.");
+                return null;
+            }
+
+            try {
+                const response = await fetch(`/api/teams/${teamId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                if (!response.ok) {
+                    console.error("Error fetching team:", await response.json());
+                    return null;
+                }
+
+                const data = await response.json();
+                return data.team || null;
+            } catch (error) {
+                console.error("Error fetching team:", error);
+                return null;
+            }
+        },
+
+        // Join a team
+        joinTeam: async function(teamId) {
+            if (!token) {
+                console.error("Token is not set.");
+                return null;
+            }
+
+            try {
+                const response = await fetch(`/api/teams/${teamId}/join`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                if (!response.ok) {
+                    console.error("Error joining team:", await response.json());
+                    return null;
+                }
+
+                return await response.json();
+            } catch (error) {
+                console.error("Error joining team:", error);
+                return null;
+            }
+        },
+
+        // Leave a team
+        leaveTeam: async function(teamId) {
+            if (!token) {
+                console.error("Token is not set.");
+                return null;
+            }
+
+            try {
+                const response = await fetch(`/api/teams/${teamId}/leave`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                if (!response.ok) {
+                    console.error("Error leaving team:", await response.json());
+                    return null;
+                }
+
+                return await response.json();
+            } catch (error) {
+                console.error("Error leaving team:", error);
+                return null;
+            }
+        },
+
+        // Get team members
+        getTeamMembers: async function(teamId) {
+            if (!token) {
+                console.error("Token is not set.");
+                return [];
+            }
+
+            try {
+                const response = await fetch(`/api/teams/${teamId}/members`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                if (!response.ok) {
+                    console.error("Error fetching team members:", await response.json());
+                    return [];
+                }
+
+                const data = await response.json();
+                return data.members || [];
+            } catch (error) {
+                console.error("Error fetching team members:", error);
+                return [];
+            }
+        },
+
+        // Check if user is a member of a team
+        checkTeamMembership: async function(teamId) {
+            if (!token) {
+                console.error("Token is not set.");
+                return {isMember: false, role: null};
+            }
+
+            try {
+                const response = await fetch(`/api/teams/${teamId}/membership`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                if (!response.ok) {
+                    console.error("Error checking team membership:", await response.json());
+                    return {isMember: false, role: null};
+                }
+
+                const data = await response.json();
+                return {
+                    isMember: data.isMember || false,
+                    role: data.role || null
+                };
+            } catch (error) {
+                console.error("Error checking team membership:", error);
+                return {isMember: false, role: null};
+            }
         }
+        
     };
 })();

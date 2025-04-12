@@ -36,7 +36,7 @@ async function loadCalendar() {
 
 // Populate filter dropdowns with unique values from events
 function populateFilters(events) {
-    // Get unique sports
+    // Get unique sportsnode 
     const sportFilter = document.getElementById('sportFilter');
     if (!sportFilter) return;
     
