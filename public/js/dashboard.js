@@ -461,9 +461,32 @@ async function loadTeams() {
 
 async function loadScorecard() {
     const scorecardDetailsElement = document.getElementById('scorecardDetails');
-    scorecardDetailsElement.innerHTML = '<div class="loading-message">Loading scorecard...</div>';
-    // TODO: Implement actual scorecard loading logic
-    scorecardDetailsElement.innerHTML = 'No scorecard data available.';
+    
+    if (!scorecardDetailsElement) {
+        console.error('Scorecard details element not found');
+        return;
+    }
+    
+    scorecardDetailsElement.innerHTML = '<div class="loading-message">Loading scorecard data...</div>';
+    
+    try {
+        console.log('Starting scorecard loading process');
+        
+        // Check if the loadScorecard function exists in scorecard.js
+        if (typeof window.loadScorecard === 'function') {
+            console.log('Found loadScorecard function, attempting to call it');
+            await window.loadScorecard();
+            console.log('Scorecard loaded successfully');
+        } else {
+            console.error('Scorecard module not loaded properly - loadScorecard function not found');
+            scorecardDetailsElement.innerHTML = 
+                '<div class="error-message">Scorecard functionality not available. Please try refreshing the page.</div>';
+        }
+    } catch (error) {
+        console.error('Detailed error loading scorecard:', error);
+        scorecardDetailsElement.innerHTML = 
+            `<div class="error-message">Failed to load scorecard data: ${error.message || 'Unknown error'}</div>`;
+    }
 }
 //////////////////////////////////////////
 //END FUNCTIONS TO MANIPULATE THE DOM

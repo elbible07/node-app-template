@@ -1,27 +1,19 @@
 const { createConnection } = require('./server/config/db');
 
-async function deleteFirstTeam() {
+async function deleteAllUserPerformanceData() {
   const connection = await createConnection();
   
   try {
     console.log('Connecting to database...');
     
-    // First, delete from team_members table to handle foreign key constraints
-    console.log('Deleting team members for team_id = 1...');
-    const [memberResult] = await connection.execute('DELETE FROM team_members WHERE team_id = 1');
-    console.log(`Deleted ${memberResult.affectedRows} team members`);
+    // Delete all records from user_performance table
+    console.log('Deleting all records from user_performance table...');
+    const [result] = await connection.execute('DELETE FROM user_performance');
     
-    // Then delete the team itself
-    console.log('Deleting team with team_id = 1...');
-    const [teamResult] = await connection.execute('DELETE FROM teams WHERE team_id = 1');
+    console.log(`Deleted ${result.affectedRows} performance records`);
     
-    if (teamResult.affectedRows > 0) {
-      console.log('Team 1 successfully deleted!');
-    } else {
-      console.log('No team found with team_id = 1');
-    }
   } catch (error) {
-    console.error('Error deleting team:', error.message);
+    console.error('Error deleting performance data:', error.message);
   } finally {
     await connection.end();
     console.log('Database connection closed');
@@ -29,7 +21,7 @@ async function deleteFirstTeam() {
 }
 
 // Run the function
-deleteFirstTeam().catch(err => {
+deleteAllUserPerformanceData().catch(err => {
   console.error('Unhandled error:', err);
   process.exit(1);
 });

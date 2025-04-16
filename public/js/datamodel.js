@@ -556,7 +556,126 @@ const DataModel = (function () {
                 console.error("Error checking team membership:", error);
                 return {isMember: false, role: null};
             }
-        }
+        },
+                /**
+         * Extension to DataModel.js to handle scorecard functionality
+         * This should be added to your existing DataModel.js file
+         */
+
+        // Add these functions inside your DataModel IIFE
+        // Immediately after your existing functions
+
+        /**
+         * Get user performance data
+         * @returns {Promise<Array>} Array of performance records
+         */
+        getUserPerformance: async function() {
+            if (!token) {
+                console.error("Token is not set.");
+                return [];
+            }
+
+            try {
+                const response = await fetch('/api/scorecard/performance', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                if (!response.ok) {
+                    // This endpoint doesn't exist yet, so we'll handle it specially
+                    if (response.status === 404) {
+                        console.warn("Performance endpoint not implemented yet.");
+                        throw new Error("not implemented");
+                    }
+                    console.error("Error fetching performance data:", await response.json());
+                    return [];
+                }
+
+                const data = await response.json();
+                return data.performance || [];
+            } catch (error) {
+                console.error("Error fetching performance data:", error);
+                throw error;
+            }
+        },
+
+        /**
+         * Log a new performance entry
+         * @param {Object} performanceData The performance data to log
+         * @returns {Promise<Object>} Result of the operation
+         */
+        logPerformance: async function(performanceData) {
+            if (!token) {
+                console.error("Token is not set.");
+                return null;
+            }
+
+            try {
+                const response = await fetch('/api/scorecard/performance', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(performanceData)
+                });
+
+                if (!response.ok) {
+                    // This endpoint doesn't exist yet, so we'll handle it specially
+                    if (response.status === 404) {
+                        console.warn("Performance endpoint not implemented yet.");
+                        throw new Error("not implemented");
+                    }
+                    console.error("Error logging performance:", await response.json());
+                    return null;
+                }
+
+                return await response.json();
+            } catch (error) {
+                console.error("Error logging performance:", error);
+                throw error;
+            }
+        },
+
+        /**
+         * Get user achievements
+         * @returns {Promise<Array>} Array of achievements
+         */
+        getAchievements: async function() {
+            if (!token) {
+                console.error("Token is not set.");
+                return [];
+            }
+
+            try {
+                const response = await fetch('/api/scorecard/achievements', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                if (!response.ok) {
+                    // This endpoint doesn't exist yet, so we'll handle it specially
+                    if (response.status === 404) {
+                        console.warn("Achievements endpoint not implemented yet.");
+                        throw new Error("not implemented");
+                    }
+                    console.error("Error fetching achievements:", await response.json());
+                    return [];
+                }
+
+                const data = await response.json();
+                return data.achievements || [];
+            } catch (error) {
+                console.error("Error fetching achievements:", error);
+                throw error;
+            }
+        },
         
     };
 })();
