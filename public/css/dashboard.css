@@ -758,6 +758,11 @@ body {
   
   .main-menu, .settings-menu {
     width: 100%;
+    display: none;
+  }
+
+  .menu-link2{
+    display: none;
   }
   
   .action-button {

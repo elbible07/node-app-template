@@ -378,7 +378,7 @@ function generateAchievements(stats) {
     achievements.push({
         name: 'Team Captain',
         description: 'Became admin of a team',
-        icon: 'fa-solid fa-users-crown',
+        icon: 'fa-solid fa-crown',
         unlocked: stats.teamRoles.admin > 0,
         date: stats.teamRoles.admin > 0 ? new Date().toLocaleDateString() : null
     });
@@ -414,7 +414,7 @@ function createScorecardHTML(userData, stats, achievements, performanceData, joi
                 <div class="stats-grid">
                     <div class="stat-card">
                         <div class="stat-value">${stats.totalEventsAttended}</div>
-                        <div class="stat-label">Events Attended</div>
+                        <div class="stat-label">Events Joined</div>
                     </div>
                     
                     <div class="stat-card">
@@ -429,7 +429,7 @@ function createScorecardHTML(userData, stats, achievements, performanceData, joi
                     
                     <div class="stat-card">
                         <div class="stat-value">${Object.keys(stats.sportBreakdown).length}</div>
-                        <div class="stat-label">Sports Played</div>
+                        <div class="stat-label">Sports Joined</div>
                     </div>
                 </div>
             </div>
