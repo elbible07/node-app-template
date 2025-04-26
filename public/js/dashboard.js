@@ -16,6 +16,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const logoutButton = document.getElementById('logoutButton');
     const refreshButton = document.getElementById('refreshButton');
     const listUsersButton = document.getElementById('listUsersButton');
+    if (listUsersButton) {
+        listUsersButton.style.backgroundColor = '#cccccc';
+        listUsersButton.style.color = '#666666';
+        listUsersButton.style.cursor = 'not-allowed';
+        listUsersButton.style.display = 'none'; // Hide the button initially
+    }
     const tabButtons = document.querySelectorAll('.menu-link[data-tab]');
    
     // Create Event button is now part of the new layout
@@ -185,6 +191,103 @@ document.addEventListener('DOMContentLoaded', () => {
             switchTab(tabId);
         });
     });
+    
+    // Directly add top navigation click handlers with a longer delay
+    const setupTopNavigation = function() {
+        console.log('Setting up top navigation click handlers...');
+        
+        // Get the top-nav container
+        const topNavContainer = document.getElementById('top-nav-container');
+        if (!topNavContainer) {
+            console.error('Top navigation container not found!');
+            return;
+        }
+        
+        // Function to find a tab button and trigger a click on it
+        const triggerTabClick = function(tabName) {
+            console.log(`Triggering click on ${tabName} tab`);
+            const tabButton = document.querySelector(`.menu-link[data-tab="${tabName}"]`);
+            if (tabButton) {
+                tabButton.click();
+            } else {
+                console.error(`Tab button for ${tabName} not found`);
+            }
+        };
+        
+        // First, try to use direct events on the container
+        topNavContainer.addEventListener('click', function(e) {
+            // Using event delegation to handle clicks on navigation elements
+            if (e.target && e.target.closest) {
+                // Check if the click was on or inside a calendar icon link
+                const calendarLink = e.target.closest('.calendar-link');
+                if (calendarLink) {
+                    e.preventDefault();
+                    console.log('Calendar icon clicked through delegation');
+                    triggerTabClick('calendar');
+                    return;
+                }
+                
+                // Check if the click was on or inside a scorecard icon link
+                const scorecardLink = e.target.closest('.scorecard-link');
+                if (scorecardLink) {
+                    e.preventDefault();
+                    console.log('Scorecard icon clicked through delegation');
+                    triggerTabClick('scorecard');
+                    return;
+                }
+                
+                // Check if the click was on or inside a profile link
+                const profileLink = e.target.closest('.profile-link');
+                if (profileLink) {
+                    e.preventDefault();
+                    console.log('Profile link clicked through delegation');
+                    triggerTabClick('profile');
+                    return;
+                }
+            }
+        });
+        
+        // Also try direct element selection as a backup
+        // For Calendar icon
+        const calendarIcon = document.querySelector('.calendar-link');
+        if (calendarIcon) {
+            console.log('Found calendar icon, adding direct click handler');
+            calendarIcon.onclick = function(e) {
+                e.preventDefault();
+                console.log('Calendar icon clicked directly');
+                triggerTabClick('calendar');
+            };
+        }
+        
+        // For Scorecard icon
+        const scorecardIcon = document.querySelector('.scorecard-link');
+        if (scorecardIcon) {
+            console.log('Found scorecard icon, adding direct click handler');
+            scorecardIcon.onclick = function(e) {
+                e.preventDefault();
+                console.log('Scorecard icon clicked directly');
+                triggerTabClick('scorecard');
+            };
+        }
+        
+        // For Profile link
+        const profileLink = document.querySelector('.profile-link');
+        if (profileLink) {
+            console.log('Found profile link, adding direct click handler');
+            profileLink.onclick = function(e) {
+                e.preventDefault();
+                console.log('Profile link clicked directly');
+                triggerTabClick('profile');
+            };
+        }
+    };
+    
+    // Help & Support link to open email - already fixed
+    const helpSupportLink = document.querySelector('.menu-link:has(.fa-circle-question)');
+    if (helpSupportLink) {
+        helpSupportLink.setAttribute('href', 'mailto:support@sportssocial.com');
+        helpSupportLink.setAttribute('target', '_blank');
+    }
     //////////////////////////////////////////
     //END EVENT LISTENERS
     //////////////////////////////////////////
@@ -201,9 +304,12 @@ document.addEventListener('DOMContentLoaded', () => {
         DataModel.setToken(token);
 
         initTopNavigation('#top-nav-container', {
-        quote: "Champions keep playing until they get it right.",
-        tabSwitchFn: switchTab  // Your existing tab switching function
-});
+            quote: "Champions keep playing until they get it right.",
+            tabSwitchFn: switchTab  // Your existing tab switching function
+        });
+        
+        // Add a longer delay to ensure the top navigation is fully rendered
+        setTimeout(setupTopNavigation, 1000);
         
         // Find the active menu item
         const activeMenuItem = document.querySelector('.menu-item.active');

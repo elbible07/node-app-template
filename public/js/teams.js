@@ -68,8 +68,8 @@ const TeamsModule = (function() {
                 <div class="filter-group">
                     <label for="teamsFilterSelect">View:</label>
                     <select id="teamsFilterSelect" class="filter-select">
-                        <option value="my-teams">All Teams</option>
-                        <option value="all-teams">My Teams</option>
+                        <option value="all-teams">All Teams</option>
+                        <option value="my-teams">My Teams</option>
                     </select>
                 </div>
                 <div class="filter-group">

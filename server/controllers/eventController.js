@@ -48,7 +48,7 @@ exports.getAllEvents = async (req, res) => {
       SELECT e.*, u.username as creator_name 
       FROM events e
       JOIN users u ON e.creator_id = u.user_id
-      ORDER BY e.event_date ASC
+      ORDER BY e.event_date DESC
     `);
     
     res.status(200).json({
@@ -202,7 +202,7 @@ exports.getJoinedEvents = async (req, res) => {
       JOIN users u ON e.creator_id = u.user_id
       JOIN event_participants ep ON e.event_id = ep.event_id
       WHERE ep.user_id = ?
-      ORDER BY e.event_date ASC
+      ORDER BY e.event_date DESC
     `, [userId]);
     
     res.status(200).json({
